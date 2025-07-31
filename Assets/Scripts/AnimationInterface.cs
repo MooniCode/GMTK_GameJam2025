@@ -113,8 +113,6 @@ public class AnimationInterface : MonoBehaviour
 
         // Load timeline for new animation type
         LoadTimelineState(currentAnimationType);
-
-        Debug.Log($"Switched to {currentAnimationType} animation timeline");
     }
 
     void SaveCurrentTimelineState()
@@ -131,7 +129,6 @@ public class AnimationInterface : MonoBehaviour
 
             // Save it to the dictionary
             savedTimelines[currentAnimationType] = timelineCopy;
-            Debug.Log($"Saved timeline state for {currentAnimationType} with {GetActiveFrameCount()} frames");
         }
         else
         {
@@ -139,7 +136,6 @@ public class AnimationInterface : MonoBehaviour
             if (savedTimelines.ContainsKey(currentAnimationType))
             {
                 savedTimelines.Remove(currentAnimationType);
-                Debug.Log($"Removed empty timeline for {currentAnimationType}");
             }
         }
     }
@@ -170,8 +166,6 @@ public class AnimationInterface : MonoBehaviour
             // Update visual slots
             UpdateTimelineVisuals();
 
-            Debug.Log($"Loaded existing timeline for {animationType} with {GetActiveFrameCount()} frames");
-
             // Start preview if we have frames
             if (GetActiveFrameCount() > 0)
             {
@@ -181,7 +175,6 @@ public class AnimationInterface : MonoBehaviour
         else
         {
             // Start with completely empty timeline
-            Debug.Log($"Starting with empty timeline for {animationType}");
             isPlaying = false;
             animationPreview.sprite = null;
         }
@@ -236,8 +229,6 @@ public class AnimationInterface : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-
-        Debug.Log("Total collected frames: " + PlayerAnimationManager.Instance.collectedFrames.Count);
 
         // Display all collected frames using UI sprite (same as pickup)
         foreach (FrameData frameData in PlayerAnimationManager.Instance.collectedFrames)
@@ -351,7 +342,6 @@ public class AnimationInterface : MonoBehaviour
 
         if (activeFrames.Count == 0)
         {
-            Debug.LogWarning("No frames in timeline to create animation!");
             return;
         }
 
@@ -360,11 +350,6 @@ public class AnimationInterface : MonoBehaviour
 
         // Create the custom animation
         PlayerAnimationManager.Instance.CreateCustomAnimation(animationType, activeFrames, animationSpeed);
-
-        Debug.Log($"Created {animationType} animation with {activeFrames.Count} frames!");
-
-        // Clear the timeline after creating animation (optional - remove if you want to keep frames)
-        // ClearTimeline();
     }
 
     void ClearTimeline()
@@ -429,13 +414,11 @@ public class AnimationInterface : MonoBehaviour
         {
             // Create/update the animation for the current type
             PlayerAnimationManager.Instance.CreateCustomAnimation(currentAnimationType, activeFrames, animationSpeed);
-            Debug.Log($"Updated {currentAnimationType} animation with {activeFrames.Count} frames");
         }
         else
         {
             // Remove the animation if no frames left
             PlayerAnimationManager.Instance.RemoveCustomAnimation(currentAnimationType);
-            Debug.Log($"Removed {currentAnimationType} animation - no frames in timeline");
         }
     }
 

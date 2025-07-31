@@ -475,7 +475,7 @@ MonoBehaviour:
   groundCheckRadius: 0.2
   groundLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 8
   canWalk: 1
   canJump: 0
 --- !u!114 &142840003
@@ -565,7 +565,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.21, y: 0.33}
+  m_Size: {x: 0.21, y: 0.32}
   m_EdgeRadius: 0
 --- !u!1 &184104575
 GameObject:
@@ -3447,7 +3447,7 @@ GameObject:
   - component: {fileID: 1329573948}
   - component: {fileID: 1329573947}
   - component: {fileID: 1329573946}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -192,8 +192,6 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             rectTransform.anchorMax = Vector2.one;
             rectTransform.offsetMin = Vector2.zero;
             rectTransform.offsetMax = Vector2.zero;
-
-            Debug.Log($"Created timeline draggable frame for {frameData.frameType} using UI sprite");
         }
         else
         {

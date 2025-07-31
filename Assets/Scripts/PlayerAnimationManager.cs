@@ -20,6 +20,7 @@ public class PlayerAnimationManager : MonoBehaviour
     // References to player components
     private SpriteRenderer playerSpriteRenderer;
     private PlayerController playerController;
+    private Rigidbody2D playerRigidbody;
 
     void Awake()
     {
@@ -38,12 +39,21 @@ public class PlayerAnimationManager : MonoBehaviour
     void Start()
     {
         // Get player components
-        playerSpriteRenderer = FindObjectOfType<PlayerController>()?.GetComponent<SpriteRenderer>();
-        playerController = FindObjectOfType<PlayerController>();
+        playerController = FindAnyObjectByType<PlayerController>();
+        if (playerController != null)
+        {
+            playerSpriteRenderer = playerController.GetComponent<SpriteRenderer>();
+            playerRigidbody = playerController.GetComponent<Rigidbody2D>();
+        }
 
         if (playerSpriteRenderer == null)
         {
             Debug.LogError("Could not find player spriteRenderer");
+        }
+
+        if (playerRigidbody == null)
+        {
+            Debug.LogError("Could not find player Rigidbody2D");
         }
     }
 
@@ -85,14 +95,12 @@ public class PlayerAnimationManager : MonoBehaviour
         // Create a FrameData copy before the original is destroyed
         FrameData frameData = new FrameData(frame.frameType, frame.frameSprite, frame.animationSprite);
         collectedFrames.Add(frameData);
-        Debug.Log("Collected frame: " + frameData.frameType);
     }
 
     public void CreateCustomAnimation(string animationType, List<FrameData> frames, float frameRate)
     {
         if (frames.Count == 0)
         {
-            Debug.LogWarning("Cannot create animation without frames");
             return;
         }
 
@@ -114,8 +122,6 @@ public class PlayerAnimationManager : MonoBehaviour
 
         // Unlock the corresponding ability
         UnlockAbility(animationType);
-
-        Debug.Log($"Created/Updated {animationType} animation with {frames.Count} frames!");
     }
 
     void UnlockAbility(string animationType)
@@ -133,13 +139,13 @@ public class PlayerAnimationManager : MonoBehaviour
                 break;
             case "idle":
                 // Immediately start idle animation if player is not moving
-                if (playerController.GetComponent<CharacterController>().velocity.magnitude < 0.1f)
+                if (playerRigidbody != null && playerRigidbody.linearVelocity.magnitude < 0.1f)
                 {
                     TriggerIdleAnimation();
                 }
                 break;
             default:
-                Debug.Log($"No ability unlock defined for animation type: {animationType}");
+                // No ability lock defined for animation type
                 break;
         }
     }
@@ -205,7 +211,6 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         // Remove the frame from collected frames since it's now being used
         collectedFrames.Remove(frameData);
-        Debug.Log($"Used frame: {frameData.frameType}. Remaining frames: {collectedFrames.Count}");
     }
 
     public void RemoveCustomAnimation(string animationType)
@@ -221,8 +226,6 @@ public class PlayerAnimationManager : MonoBehaviour
 
         // Lock the corresponding ability
         LockAbility(animationType);
-
-        Debug.Log($"Removed {animationType} animation and locked ability!");
     }
 
     void LockAbility(string animationType)
@@ -233,10 +236,10 @@ public class PlayerAnimationManager : MonoBehaviour
         {
             case "walk":
             case "run":
-                playerController.LockWalking(); // You'll need to implement this
+                playerController.LockWalking();
                 break;
             case "jump":
-                playerController.LockJumping(); // You'll need to implement this
+                playerController.LockJumping();
                 break;
             case "idle":
                 // Stop idle animation if it's playing
@@ -246,7 +249,7 @@ public class PlayerAnimationManager : MonoBehaviour
                 }
                 break;
             default:
-                Debug.Log($"No ability lock defined for animation type: {animationType}");
+                // No ability lock defined for animation type
                 break;
         }
     }

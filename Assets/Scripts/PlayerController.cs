@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     [Header("Ground Detection")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
-    public LayerMask groundLayerMask = 1; // Default layer
+    public LayerMask groundLayerMask = 1;
 
     [Header("Unlocked Abilities")]
     public bool canWalk = false;
@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour
 
     // Components
     private Rigidbody2D rb;
-    private Animator animator;
     private SpriteRenderer spriteRenderer;
 
     // Movement variables
@@ -25,10 +24,13 @@ public class PlayerController : MonoBehaviour
     private bool wasMoving = false;
     private bool wasGrounded = false;
 
+    // Input storage for FixedUpdate
+    private float horizontalInput;
+    private bool jumpInput;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         // Set up rigidbody constraints
@@ -39,7 +41,7 @@ public class PlayerController : MonoBehaviour
         {
             GameObject groundCheckObj = new GameObject("GroundCheck");
             groundCheckObj.transform.SetParent(transform);
-            groundCheckObj.transform.localPosition = new Vector3(0, -0.5f, 0);
+            groundCheckObj.transform.localPosition = new Vector3(0, -0.18f, 0);
             groundCheck = groundCheckObj.transform;
         }
     }
@@ -51,25 +53,42 @@ public class PlayerController : MonoBehaviour
         HandleAnimations();
     }
 
+    void FixedUpdate()
+    {
+        // Handle physics-based movement in FixedUpdate
+        HandleMovement();
+    }
+
     void HandleInput()
     {
-        float horizontal = Input.GetAxis("Horizontal");
+        // Capture input for use in FixedUpdate
+        horizontalInput = Input.GetAxis("Horizontal");
 
-        // Walking (only if unlocked)
-        if (canWalk && Mathf.Abs(horizontal) > 0.1f)
+        // Jumping input (check for key press)
+        if (Input.GetKeyDown(KeyCode.Space) && canJump && isGrounded)
         {
-            Walk(horizontal);
+            jumpInput = true;
+        }
+    }
+
+    void HandleMovement()
+    {
+        // Walking (only if unlocked)
+        if (canWalk && Mathf.Abs(horizontalInput) > 0.1f)
+        {
+            Walk(horizontalInput);
         }
         else
         {
-            // Stop horizontal movement gradually for more natural feel
+            // Stop horizontal movement while preserving vertical velocity
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
 
-        // Jumping (only if unlocked and grounded)
-        if (canJump && Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        // Handle jumping
+        if (jumpInput)
         {
             Jump();
+            jumpInput = false; // Reset jump input
         }
     }
 
@@ -161,13 +180,11 @@ public class PlayerController : MonoBehaviour
     public void UnlockWalking(float qualityMultiplier)
     {
         canWalk = true;
-        Debug.Log("Walking ability unlocked!");
     }
 
     public void UnlockJumping(float qualityMultiplier)
     {
         canJump = true;
-        Debug.Log("Jumping ability unlocked!");
     }
 
     // Called by Animation Manager when animations are removed
@@ -180,14 +197,11 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
-
-        Debug.Log("Walking ability locked - no walk animation available");
     }
 
     public void LockJumping()
     {
         canJump = false;
-        Debug.Log("Jumping ability locked - no jump animation available");
     }
 
     // Visualize ground check in scene view
