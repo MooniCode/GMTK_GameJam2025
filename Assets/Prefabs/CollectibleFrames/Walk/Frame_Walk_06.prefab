@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6524513613454666792}
   - component: {fileID: 2701353292885968477}
   - component: {fileID: 6165309790491561556}
-  - component: {fileID: 3810156342677748007}
+  - component: {fileID: 3836718012040504277}
   m_Layer: 0
-  m_Name: Frame_Walk_01
+  m_Name: Frame_Walk_06
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -102,10 +102,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frameType: Walk
-  frameSprite: {fileID: 2016310763, guid: 4fece2c3347a17e4894e281bbe93815a, type: 3}
-  animationSprite: {fileID: 2016310763, guid: 4fece2c3347a17e4894e281bbe93815a, type: 3}
+  frameSprite: {fileID: 98979171, guid: ecfda1708962556419933a36fd0b61fc, type: 3}
+  animationSprite: {fileID: -1419112276, guid: a85a9527e61a73144af9235a18400b2b, type: 3}
   spriteRenderer: {fileID: 2701353292885968477}
---- !u!61 &3810156342677748007
+--- !u!61 &3836718012040504277
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

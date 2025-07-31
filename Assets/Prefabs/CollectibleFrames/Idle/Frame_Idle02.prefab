@@ -102,8 +102,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frameType: Walk
-  frameSprite: {fileID: -1372212667, guid: 6decc05d3378431479b4c97540978068, type: 3}
-  animationSprite: {fileID: -107939837, guid: 664f55ee603fb9040a7eacca8a9fddfc, type: 3}
+  frameSprite: {fileID: -1619902091, guid: 27619d96e8a72ca468abc95c6bb50ef2, type: 3}
+  animationSprite: {fileID: -1619902091, guid: 27619d96e8a72ca468abc95c6bb50ef2, type: 3}
   spriteRenderer: {fileID: 5334954401110619810}
 --- !u!61 &4178709948949499168
 BoxCollider2D:

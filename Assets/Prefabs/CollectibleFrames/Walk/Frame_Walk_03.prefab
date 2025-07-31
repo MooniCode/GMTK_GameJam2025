@@ -29,8 +29,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -102,8 +102,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frameType: Walk
-  frameSprite: {fileID: 1567330356, guid: ecfda1708962556419933a36fd0b61fc, type: 3}
-  animationSprite: {fileID: -1554750828, guid: a85a9527e61a73144af9235a18400b2b, type: 3}
+  frameSprite: {fileID: -785518008, guid: 4fece2c3347a17e4894e281bbe93815a, type: 3}
+  animationSprite: {fileID: -785518008, guid: 4fece2c3347a17e4894e281bbe93815a, type: 3}
   spriteRenderer: {fileID: 2701353292885968477}
 --- !u!61 &1144179111188921493
 BoxCollider2D:

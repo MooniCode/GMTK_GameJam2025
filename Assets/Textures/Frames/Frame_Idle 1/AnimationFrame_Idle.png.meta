@@ -1,40 +1,16 @@
 fileFormatVersion: 2
-guid: 5f1ba0be19d1c8046bd9e1d987fdf516
+guid: 27619d96e8a72ca468abc95c6bb50ef2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1371029052870881117
-    second: player new jump 48x48_0
+      213: 6658734240957731106
+    second: idle_strip3_0
   - first:
-      213: -2315129620777849004
-    second: player new jump 48x48_1
+      213: -7707281092331168946
+    second: idle_strip3_1
   - first:
-      213: 3525680688647848675
-    second: player new jump 48x48_2
-  - first:
-      213: -6961841436348922279
-    second: player new jump 48x48_3
-  - first:
-      213: -8838444428936912337
-    second: player new jump 48x48_4
-  - first:
-      213: 5615097069923012861
-    second: player new jump 48x48_5
-  - first:
-      213: -2335703473165064500
-    second: player new jump 48x48_6
-  - first:
-      213: 9167086494364418317
-    second: player new jump 48x48_7
-  - first:
-      213: -1654628250928881350
-    second: player new jump 48x48_8
-  - first:
-      213: -4118337328299782798
-    second: player new jump 48x48_9
-  - first:
-      213: 4330072777175347421
-    second: player new jump 48x48_10
+      213: -4614467116210635426
+    second: idle_strip3_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -67,7 +43,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -81,7 +57,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -105,7 +81,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -143,13 +119,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: player new jump 48x48_0
+      name: AnimationFrame_Idle_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 48
-        height: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -158,20 +134,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1e6df60bb0337204da99233b08127c13
-      internalID: 1654056231
+      spriteID: fd08f2fa837001149bafe43ca1c69c0b
+      internalID: 326672324
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player new jump 48x48_1
+      name: AnimationFrame_Idle_1
       rect:
         serializedVersion: 2
-        x: 48
+        x: 16
         y: 0
-        width: 48
-        height: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -180,20 +156,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: eebfafc58efc2a9409162c736cb7f061
-      internalID: -307178440
+      spriteID: 3ead26763ceb91940b65dc9b10361476
+      internalID: -1619902091
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player new jump 48x48_2
+      name: AnimationFrame_Idle_2
       rect:
         serializedVersion: 2
-        x: 96
+        x: 32
         y: 0
-        width: 48
-        height: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -202,74 +178,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4b62c9b8d38288d41ba6644d3d263c2f
-      internalID: 1171691063
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player new jump 48x48_3
-      rect:
-        serializedVersion: 2
-        x: 144
-        y: 0
-        width: 48
-        height: 48
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5718e769e4e339c4c8c4a35c6d2d611c
-      internalID: 360586341
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player new jump 48x48_4
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 0
-        width: 48
-        height: 48
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: be0a54fb133a65448889c47fa772cf4a
-      internalID: -262188148
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player new jump 48x48_5
-      rect:
-        serializedVersion: 2
-        x: 240
-        y: 0
-        width: 48
-        height: 48
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4a8e55a638e78ce49ad8ee9d075f77c5
-      internalID: 537379242
+      spriteID: 805bf26f55aa53046b9a7ecc20db1fb7
+      internalID: 1528878561
       vertices: []
       indices: 
       edges: []
@@ -278,7 +188,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 495c6d7a110e9f44db44029aff02ce39
+    spriteID: 369da0c718f8a3145818547728bc90b0
     internalID: 0
     vertices: []
     indices: 
@@ -288,12 +198,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      player new jump 48x48_0: 1654056231
-      player new jump 48x48_1: -307178440
-      player new jump 48x48_2: 1171691063
-      player new jump 48x48_3: 360586341
-      player new jump 48x48_4: -262188148
-      player new jump 48x48_5: 537379242
+      AnimationFrame_Idle_0: 326672324
+      AnimationFrame_Idle_1: -1619902091
+      AnimationFrame_Idle_2: 1528878561
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
