@@ -574,7 +574,7 @@ MonoBehaviour:
   timelineSlotPrefab: {fileID: 2896137689667726716, guid: 6e070e87954de544b93fd66ab987e88a, type: 3}
   maxTimelineSlots: 6
   inventoryContent: {fileID: 1024958816}
-  frameDisplayPrefab: {fileID: 6494756551456015710, guid: f0f42d5f56ffb2f458c1fccbcc5761e6, type: 3}
+  frameDisplayPrefab: {fileID: 7861614891265209578, guid: c65fc21f21e4010419ce6381e09943dc, type: 3}
   animationTypeDropdown: {fileID: 887439895}
 --- !u!4 &403080207
 Transform:
@@ -2069,8 +2069,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

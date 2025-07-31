@@ -54,6 +54,8 @@ public class AnimationInterface : MonoBehaviour
                 currentAnimationType = animationTypeDropdown.options[animationTypeDropdown.value].text.ToLower();
             }
         }
+
+        SetupInventoryDropHandler();
     }
 
     void Update()
@@ -224,7 +226,7 @@ public class AnimationInterface : MonoBehaviour
         }
     }
 
-    void RefreshInventoryDisplay()
+    public void RefreshInventoryDisplay()
     {
         // Clear existing inventory display
         foreach (Transform child in inventoryContent)
@@ -394,5 +396,19 @@ public class AnimationInterface : MonoBehaviour
 
         // Fallback: use current animation type
         return currentAnimationType;
+    }
+
+    void SetupInventoryDropHandler()
+    {
+        // Add a drop handler component to the inventory content area
+        if (inventoryContent != null)
+        {
+            InventoryDropHandler dropHandler = inventoryContent.gameObject.GetComponent<InventoryDropHandler>();
+            if (dropHandler == null)
+            {
+                dropHandler = inventoryContent.gameObject.AddComponent<InventoryDropHandler>();
+            }
+            dropHandler.animationInterface = this;
+        }
     }
 }
