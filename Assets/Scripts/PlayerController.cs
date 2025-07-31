@@ -5,39 +5,50 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Settings")]
     public float baseWalkSpeed = 5f;
     public float baseJumpHeight = 3f;
-    public float gravity = -20f;
+
+    [Header("Ground Detection")]
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.2f;
+    public LayerMask groundLayerMask = 1; // Default layer
 
     [Header("Unlocked Abilities")]
     public bool canWalk = false;
     public bool canJump = false;
 
     // Components
-    private CharacterController controller;
+    private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
     // Movement variables
-    private Vector3 velocity;
     private bool isGrounded;
     private bool wasMoving = false;
     private bool wasGrounded = false;
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Set up rigidbody constraints
+        rb.freezeRotation = true;
+
+        // Create ground check point if it doesn't exist
+        if (groundCheck == null)
+        {
+            GameObject groundCheckObj = new GameObject("GroundCheck");
+            groundCheckObj.transform.SetParent(transform);
+            groundCheckObj.transform.localPosition = new Vector3(0, -0.5f, 0);
+            groundCheck = groundCheckObj.transform;
+        }
     }
 
     void Update()
     {
         CheckGrounded();
         HandleInput();
-        ApplyGravity();
         HandleAnimations();
-
-        // Move the character
-        controller.Move(velocity * Time.deltaTime);
     }
 
     void HandleInput()
@@ -51,8 +62,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            // Stop horizontal movement
-            velocity.x = 0;
+            // Stop horizontal movement gradually for more natural feel
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
 
         // Jumping (only if unlocked and grounded)
@@ -65,7 +76,9 @@ public class PlayerController : MonoBehaviour
     void Walk(float direction)
     {
         float actualSpeed = baseWalkSpeed;
-        velocity.x = direction * actualSpeed;
+
+        // Set horizontal velocity while preserving vertical velocity
+        rb.linearVelocity = new Vector2(direction * actualSpeed, rb.linearVelocity.y);
 
         // Flip sprite based on direction
         if (direction > 0)
@@ -77,8 +90,13 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
         float actualJumpHeight = baseJumpHeight;
+
         // Calculate jump velocity needed to reach desired height
-        velocity.y = Mathf.Sqrt(actualJumpHeight * -2f * gravity);
+        // Using: v = sqrt(2 * g * h) where g is gravity (positive value)
+        float jumpVelocity = Mathf.Sqrt(2f * Mathf.Abs(Physics2D.gravity.y * rb.gravityScale) * actualJumpHeight);
+
+        // Set vertical velocity
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpVelocity);
 
         // Trigger jump animation if available
         if (PlayerAnimationManager.Instance != null &&
@@ -88,24 +106,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void ApplyGravity()
-    {
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f; // Small negative value to keep grounded
-        }
-        else
-        {
-            velocity.y += gravity * Time.deltaTime;
-        }
-    }
-
     void CheckGrounded()
     {
         wasGrounded = isGrounded;
-        isGrounded = controller.isGrounded;
 
-        // If we just landed, stop jump animation and return to appropriate animation
+        // Check if player is touching ground using overlap circle
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayerMask);
+
+        // If we just landed, handle landing
         if (!wasGrounded && isGrounded)
         {
             HandleAnimations();
@@ -116,7 +124,7 @@ public class PlayerController : MonoBehaviour
     {
         if (PlayerAnimationManager.Instance == null) return;
 
-        bool isMoving = Mathf.Abs(velocity.x) > 0.1f;
+        bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
 
         // Don't interrupt jump animation while in air
         if (!isGrounded && PlayerAnimationManager.Instance.HasAnimation("jump"))
@@ -162,15 +170,15 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Jumping ability unlocked!");
     }
 
-    // NEW METHODS: Called by Animation Manager when animations are removed
+    // Called by Animation Manager when animations are removed
     public void LockWalking()
     {
         canWalk = false;
 
         // If player is currently moving, stop them
-        if (Mathf.Abs(velocity.x) > 0.1f)
+        if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
         {
-            velocity.x = 0;
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
 
         Debug.Log("Walking ability locked - no walk animation available");
@@ -180,5 +188,15 @@ public class PlayerController : MonoBehaviour
     {
         canJump = false;
         Debug.Log("Jumping ability locked - no jump animation available");
+    }
+
+    // Visualize ground check in scene view
+    void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = isGrounded ? Color.green : Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        }
     }
 }
