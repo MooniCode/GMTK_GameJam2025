@@ -83,7 +83,7 @@ public class PlayerAnimationManager : MonoBehaviour
     public void CollectFrame(AnimationFramePickup frame)
     {
         // Create a FrameData copy before the original is destroyed
-        FrameData frameData = new FrameData(frame.frameType, frame.frameSprite);
+        FrameData frameData = new FrameData(frame.frameType, frame.frameSprite, frame.animationSprite);
         collectedFrames.Add(frameData);
         Debug.Log("Collected frame: " + frameData.frameType);
     }
@@ -103,10 +103,19 @@ public class PlayerAnimationManager : MonoBehaviour
         CustomAnimation newAnimation = new CustomAnimation(animationType, frames, frameRate);
         createdAnimations.Add(newAnimation);
 
+        // If this animation type is currently playing, update it immediately
+        if (currentAnimation != null && currentAnimation.animationType == animationType)
+        {
+            currentAnimation = newAnimation;
+            currentFrameIndex = 0; // Reset to first frame
+            animationTimer = 0f;
+            UpdatePlayerSprite();
+        }
+
         // Unlock the corresponding ability
         UnlockAbility(animationType);
 
-        Debug.Log($"Created {animationType} animation with {frames.Count} frames!");
+        Debug.Log($"Created/Updated {animationType} animation with {frames.Count} frames!");
     }
 
     void UnlockAbility(string animationType)
@@ -166,7 +175,7 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         if (playerSpriteRenderer != null && currentAnimation != null && currentFrameIndex < currentAnimation.frames.Count)
         {
-            playerSpriteRenderer.sprite = currentAnimation.frames[currentFrameIndex].frameSprite;
+            playerSpriteRenderer.sprite = currentAnimation.frames[currentFrameIndex].GetAnimationSprite();
         }
     }
 
@@ -197,5 +206,48 @@ public class PlayerAnimationManager : MonoBehaviour
         // Remove the frame from collected frames since it's now being used
         collectedFrames.Remove(frameData);
         Debug.Log($"Used frame: {frameData.frameType}. Remaining frames: {collectedFrames.Count}");
+    }
+
+    public void RemoveCustomAnimation(string animationType)
+    {
+        // Remove animation from created animations list
+        createdAnimations.RemoveAll(anim => anim.animationType == animationType);
+
+        // If the removed animation is currently playing, stop it
+        if (currentAnimation != null && currentAnimation.animationType == animationType)
+        {
+            StopAnimation();
+        }
+
+        // Lock the corresponding ability
+        LockAbility(animationType);
+
+        Debug.Log($"Removed {animationType} animation and locked ability!");
+    }
+
+    void LockAbility(string animationType)
+    {
+        if (playerController == null) return;
+
+        switch (animationType.ToLower())
+        {
+            case "walk":
+            case "run":
+                playerController.LockWalking(); // You'll need to implement this
+                break;
+            case "jump":
+                playerController.LockJumping(); // You'll need to implement this
+                break;
+            case "idle":
+                // Stop idle animation if it's playing
+                if (currentAnimation != null && currentAnimation.animationType == "idle")
+                {
+                    StopAnimation();
+                }
+                break;
+            default:
+                Debug.Log($"No ability lock defined for animation type: {animationType}");
+                break;
+        }
     }
 }

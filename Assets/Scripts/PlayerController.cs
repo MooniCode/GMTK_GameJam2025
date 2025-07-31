@@ -1,4 +1,3 @@
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -120,7 +119,7 @@ public class PlayerController : MonoBehaviour
         bool isMoving = Mathf.Abs(velocity.x) > 0.1f;
 
         // Don't interrupt jump animation while in air
-        if (!isGrounded && PlayerAnimationManager.Instance.HasAnimation("Jump"))
+        if (!isGrounded && PlayerAnimationManager.Instance.HasAnimation("jump"))
         {
             // Jump animation is already handled in Jump() method
             return;
@@ -137,7 +136,7 @@ public class PlayerController : MonoBehaviour
                     PlayerAnimationManager.Instance.TriggerWalkAnimation();
                 }
             }
-            else if (!isMoving && PlayerAnimationManager.Instance.HasAnimation("Idle"))
+            else if (!isMoving && PlayerAnimationManager.Instance.HasAnimation("idle"))
             {
                 // Only start idle animation if we were moving or don't have a current animation
                 if (wasMoving || PlayerAnimationManager.Instance.currentAnimation?.animationType != "idle")
@@ -161,5 +160,25 @@ public class PlayerController : MonoBehaviour
     {
         canJump = true;
         Debug.Log("Jumping ability unlocked!");
+    }
+
+    // NEW METHODS: Called by Animation Manager when animations are removed
+    public void LockWalking()
+    {
+        canWalk = false;
+
+        // If player is currently moving, stop them
+        if (Mathf.Abs(velocity.x) > 0.1f)
+        {
+            velocity.x = 0;
+        }
+
+        Debug.Log("Walking ability locked - no walk animation available");
+    }
+
+    public void LockJumping()
+    {
+        canJump = false;
+        Debug.Log("Jumping ability locked - no jump animation available");
     }
 }

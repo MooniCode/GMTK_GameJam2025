@@ -1,10 +1,43 @@
 fileFormatVersion: 2
-guid: 76c6577f8b3c70f4f9aa3dbc760e9ed6
+guid: 7bbf4f3f75e9962458e0b9cc46a82457
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4845856768356297447
-    second: Frame_Walk_2_0
+      213: -2920356855000664537
+    second: gmtk-game-jam-2025-logo-black(1)_0
+  - first:
+      213: -4794145736338322772
+    second: gmtk-game-jam-2025-logo-black(1)_1
+  - first:
+      213: 623744421510297163
+    second: gmtk-game-jam-2025-logo-black(1)_2
+  - first:
+      213: -6024590608268923159
+    second: gmtk-game-jam-2025-logo-black(1)_3
+  - first:
+      213: -511382694504458556
+    second: gmtk-game-jam-2025-logo-black(1)_4
+  - first:
+      213: -8054059425602962667
+    second: gmtk-game-jam-2025-logo-black(1)_5
+  - first:
+      213: 7853830313785467530
+    second: gmtk-game-jam-2025-logo-black(1)_6
+  - first:
+      213: 148698261708510039
+    second: gmtk-game-jam-2025-logo-black(1)_7
+  - first:
+      213: 4834256502668884223
+    second: gmtk-game-jam-2025-logo-black(1)_8
+  - first:
+      213: -6658716980347594074
+    second: gmtk-game-jam-2025-logo-black(1)_9
+  - first:
+      213: -2192122803320390934
+    second: gmtk-game-jam-2025-logo-black(1)_10
+  - first:
+      213: -3907958152103166744
+    second: gmtk-game-jam-2025-logo-black(1)_11
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +70,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -113,23 +146,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Frame_Walk_2_0
+      name: gmtk-game-jam-2025-logo-black(1)_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 48
-        height: 48
+        width: 3840
+        height: 2160
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 7eaac4e6e01ff3340800000000000000
-      internalID: 4845856768356297447
+      spriteID: e2f9044f56a578747a4537f85fbcb20d
+      internalID: -2142591995
       vertices: []
       indices: 
       edges: []
@@ -138,7 +171,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 37c6671aa550899409d405a7fd63881a
+    spriteID: d2986ffa1e0ca57408a3fa9e75fb424d
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +181,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Frame_Walk_2_0: 4845856768356297447
+      gmtk-game-jam-2025-logo-black(1)_0: -2142591995
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,10 +1,37 @@
 fileFormatVersion: 2
-guid: 2b797ed4bddb8fd459a0233c55a2a619
+guid: ba4a3c28a80c10b40becf44b812b93fc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5314843955946798662
-    second: Frame_Walk_3_0
+      213: -6371979109034043406
+    second: MooniLogo_0
+  - first:
+      213: -1085527845148745158
+    second: MooniLogo_1
+  - first:
+      213: -7207449020427440838
+    second: MooniLogo_2
+  - first:
+      213: 725247362800639345
+    second: MooniLogo_3
+  - first:
+      213: 1672873556137959211
+    second: MooniLogo_4
+  - first:
+      213: 2278058284782867447
+    second: MooniLogo_5
+  - first:
+      213: 1737222491220090143
+    second: MooniLogo_6
+  - first:
+      213: 5735770250155785333
+    second: MooniLogo_7
+  - first:
+      213: 1325178233082492214
+    second: MooniLogo_8
+  - first:
+      213: -5293372364625417908
+    second: MooniLogo_9
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,23 +140,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Frame_Walk_3_0
+      name: MooniLogo_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 48
-        height: 48
+        width: 1920
+        height: 1080
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ab1c821d491ed36b0800000000000000
-      internalID: -5314843955946798662
+      spriteID: 8951df2a241f1a74e8ea887635b26ff1
+      internalID: -598287265
       vertices: []
       indices: 
       edges: []
@@ -138,7 +165,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 69ad048ebccb08941ab474d5422824f4
     internalID: 0
     vertices: []
     indices: 
@@ -147,7 +174,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MooniLogo_0: -598287265
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

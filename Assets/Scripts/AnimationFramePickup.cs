@@ -4,7 +4,10 @@ public class AnimationFramePickup : MonoBehaviour
 {
     [Header("Frame Data")]
     public string frameType;
+
+    [Header("Sprites")]
     public Sprite frameSprite;
+    public Sprite animationSprite;
 
     [Header("Visual")]
     public SpriteRenderer spriteRenderer;

@@ -185,6 +185,9 @@ public class AnimationInterface : MonoBehaviour
             isPlaying = false;
             animationPreview.sprite = null;
         }
+
+        // Update the animation immediately after loading timeline
+        UpdateCurrentAnimation();
     }
 
     void ClearTimelineVisuals()
@@ -236,15 +239,15 @@ public class AnimationInterface : MonoBehaviour
 
         Debug.Log("Total collected frames: " + PlayerAnimationManager.Instance.collectedFrames.Count);
 
-        // Display all collected frames
+        // Display all collected frames using UI sprite (same as pickup)
         foreach (FrameData frameData in PlayerAnimationManager.Instance.collectedFrames)
         {
             GameObject frameDisplay = Instantiate(frameDisplayPrefab, inventoryContent);
             Image frameImage = frameDisplay.GetComponent<Image>();
 
-            if (frameImage != null && frameData.frameSprite != null)
+            if (frameImage != null && frameData.GetUISprite() != null)
             {
-                frameImage.sprite = frameData.frameSprite;
+                frameImage.sprite = frameData.GetUISprite(); // Use UI sprite (same as pickup)
             }
 
             // Add draggable component to inventory frames
@@ -263,6 +266,9 @@ public class AnimationInterface : MonoBehaviour
 
         // Add the frame data to the timeline
         timelineFrames[slotIndex] = frameData;
+
+        // Update the animation immediately
+        UpdateCurrentAnimation();
 
         // Start the preview animation
         StartPreview();
@@ -297,7 +303,7 @@ public class AnimationInterface : MonoBehaviour
                 currentPreviewFrame = 0;
             }
 
-            animationPreview.sprite = activeFrames[currentPreviewFrame].frameSprite;
+            animationPreview.sprite = activeFrames[currentPreviewFrame].GetAnimationSprite();
         }
         else
         {
@@ -322,6 +328,9 @@ public class AnimationInterface : MonoBehaviour
         {
             timelineFrames[slotIndex] = null;
         }
+
+        // Update the animation immediately
+        UpdateCurrentAnimation();
 
         // Restart preview if there are still frames
         if (GetActiveFrameCount() > 0)
@@ -411,4 +420,24 @@ public class AnimationInterface : MonoBehaviour
             dropHandler.animationInterface = this;
         }
     }
+
+    void UpdateCurrentAnimation()
+    {
+        List<FrameData> activeFrames = GetActiveFrames();
+
+        if (activeFrames.Count > 0)
+        {
+            // Create/update the animation for the current type
+            PlayerAnimationManager.Instance.CreateCustomAnimation(currentAnimationType, activeFrames, animationSpeed);
+            Debug.Log($"Updated {currentAnimationType} animation with {activeFrames.Count} frames");
+        }
+        else
+        {
+            // Remove the animation if no frames left
+            PlayerAnimationManager.Instance.RemoveCustomAnimation(currentAnimationType);
+            Debug.Log($"Removed {currentAnimationType} animation - no frames in timeline");
+        }
+    }
+
+
 }

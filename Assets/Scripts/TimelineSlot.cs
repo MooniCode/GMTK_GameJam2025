@@ -134,7 +134,7 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
 
         if (frameData != null)
         {
-            slotImage.sprite = frameData.frameSprite;
+            slotImage.sprite = frameData.GetUISprite();
             slotImage.color = Color.white;
 
             // Create draggable frame for this slot using the same prefab as inventory
@@ -155,11 +155,11 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
         {
             currentDraggableFrame = Instantiate(frameDisplayPrefab, transform);
 
-            // Set up the draggable frame
+            // Set up the draggable frame using UI sprite (same as inventory)
             Image frameImage = currentDraggableFrame.GetComponent<Image>();
             if (frameImage != null)
             {
-                frameImage.sprite = frameData.frameSprite;
+                frameImage.sprite = frameData.GetUISprite(); // Use UI sprite (same as inventory)
                 frameImage.raycastTarget = true;
             }
 
@@ -193,7 +193,7 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             rectTransform.offsetMin = Vector2.zero;
             rectTransform.offsetMax = Vector2.zero;
 
-            Debug.Log($"Created timeline draggable frame for {frameData.frameType}");
+            Debug.Log($"Created timeline draggable frame for {frameData.frameType} using UI sprite");
         }
         else
         {
