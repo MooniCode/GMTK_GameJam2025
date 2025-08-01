@@ -29,6 +29,21 @@ public class AnimationInterface : MonoBehaviour
     public Transform timelineContainer;
     public GameObject timelineSlotPrefab;
 
+    [Header("Editor Lock Control")]
+    private bool isEditorLocked = false;
+
+    // Control editor access
+    public void SetEditorLocked(bool locked)
+    {
+        isEditorLocked = locked;
+
+        // If locking while editor is open, close it
+        if (locked && isInterfaceOpen)
+        {
+            ToggleInterface();
+        }
+    }
+
     [Header("Animation Configuration")]
     public List<AnimationTypeConfig> animationConfigs = new List<AnimationTypeConfig>
     {
@@ -52,6 +67,7 @@ public class AnimationInterface : MonoBehaviour
     private bool isPlaying = false;
     private bool isInterfaceOpen = false;
 
+    // Make isInterfaceOpen accessible
     public bool IsInterfaceOpen => isInterfaceOpen;
 
     // Dictionary to store timeline states for each animation type
@@ -94,12 +110,13 @@ public class AnimationInterface : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        // Only allow TAB toggle if editor is not locked
+        if (Input.GetKeyDown(KeyCode.Tab) && !isEditorLocked)
         {
             ToggleInterface();
         }
 
-        // Animation preview logic
+        // Animation preview logic (keep your existing code)
         if (isPlaying && timelineFrames.Count > 0)
         {
             animationTimer += Time.deltaTime;

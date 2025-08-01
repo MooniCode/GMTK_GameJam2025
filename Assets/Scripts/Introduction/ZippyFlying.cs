@@ -41,6 +41,9 @@ public class ZippyFlying : MonoBehaviour
 
     [Header("Animation Editor Detection")]
     public AnimationInterface animationInterface; // Reference to the AnimationInterface script
+
+    [Header("Editor Access Control")]
+    public bool enableEditorControlDuringIntro = true; // Set to false to disable this feature
     public List<GameObject> idleFramePrefabs; // Idle frame prefabs with AnimationFramePickup components
     public List<GameObject> walkFramePrefabs; // Walk frame prefabs with AnimationFramePickup components
 
@@ -79,6 +82,12 @@ public class ZippyFlying : MonoBehaviour
 
         // Set dialogue box off screen
         dialoguePanel.transform.localPosition = new Vector3(0, -300, 0);
+
+        // Lock animation editor at start if control is enabled
+        if (enableEditorControlDuringIntro && animationInterface != null)
+        {
+            animationInterface.SetEditorLocked(true);
+        }
     }
 
     void Update()
@@ -181,6 +190,14 @@ public class ZippyFlying : MonoBehaviour
                 if (hasIdleAnimation && isAnimationEditorClosed && wasAnimationEditorOpen)
                 {
                     Debug.Log("Zippy: Player created idle animation and closed editor! Moving to walk dialogue.");
+
+                    // Lock the animation editor again until walk frames are given
+                    if (enableEditorControlDuringIntro && animationInterface != null)
+                    {
+                        animationInterface.SetEditorLocked(true);
+                        Debug.Log("Zippy: Animation editor locked until walk frames are given.");
+                    }
+
                     currentState = IntroState.ShowingWalkDialogue;
                     wasAnimationEditorOpen = false; // Reset for potential future use
                 }
@@ -253,6 +270,13 @@ public class ZippyFlying : MonoBehaviour
                 }
             }
         }
+
+        // Unlock animation editor for idle creation
+        if (enableEditorControlDuringIntro && animationInterface != null)
+        {
+            animationInterface.SetEditorLocked(false);
+            Debug.Log("Zippy: Animation editor unlocked! You can now press TAB to open it.");
+        }
     }
 
     void GiveWalkFrames()
@@ -286,6 +310,13 @@ public class ZippyFlying : MonoBehaviour
                 }
             }
         }
+
+        // Permanently unlock animation editor after walk frames are given
+        if (enableEditorControlDuringIntro && animationInterface != null)
+        {
+            animationInterface.SetEditorLocked(false);
+            Debug.Log("Zippy: Animation editor permanently unlocked! You can now use it freely.");
+        }
     }
 
     void StartIdleDialogue()
@@ -316,13 +347,14 @@ public class ZippyFlying : MonoBehaviour
 
     bool IsAnimationEditorClosed()
     {
+        // Check if animation interface is closed using the AnimationInterface script
         if (animationInterface != null)
         {
-            return !animationInterface.IsInterfaceOpen; // Note the capital I
+            return !animationInterface.IsInterfaceOpen;
         }
 
         Debug.LogWarning("No AnimationInterface reference set! Please assign the AnimationInterface script.");
-        return true;
+        return true; // Default to assuming it's closed if we can't detect it
     }
 
     IEnumerator FlyAwayAfterDelay(float delay)
