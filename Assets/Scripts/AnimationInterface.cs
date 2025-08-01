@@ -52,6 +52,8 @@ public class AnimationInterface : MonoBehaviour
     private bool isPlaying = false;
     private bool isInterfaceOpen = false;
 
+    public bool IsInterfaceOpen => isInterfaceOpen;
+
     // Dictionary to store timeline states for each animation type
     private Dictionary<string, List<FrameData>> savedTimelines;
     private string currentAnimationType = "idle"; // Default animation type
