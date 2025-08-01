@@ -92,5 +92,4 @@ MonoBehaviour:
   animationInterface: {fileID: 0}
   slotImage: {fileID: 1495842592489692814}
   emptySlotSprite: {fileID: 233293379, guid: 87bf9fa5179d5304eb3f8a8ef7dbc939, type: 3}
-  emptySlotColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  draggableFramePrefab: {fileID: 7861614891265209578, guid: c65fc21f21e4010419ce6381e09943dc, type: 3}
+  emptySlotColor: {r: 1, g: 1, b: 1, a: 1}

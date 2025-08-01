@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c0cdb0703eca86d49b3e8fd8bcfad688
+guid: 8ee74d9b1ed86cc4da550ef1290bc66f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3445220960667927157
-    second: UIFrame_Walk_0
+      213: 731159573488969213
+    second: TimeLineBorder_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 18
+  spritePixelsToUnits: 26
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,177 +113,309 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: UIFrame_Walk_0
+      name: TimeLineBorder_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 338
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df5afeb12c9952a00800000000000000
+      internalID: 731159573488969213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 312
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92d7b02dbf772ac448695f762a457be6
+      internalID: 1841065544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 286
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8e39b8438cd42d4e9488c202af30cb7
+      internalID: 262815160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 260
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19449c2e2daf09044b09bc59e4b33c27
+      internalID: 828465989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 234
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 005b5e8c0f5709b49903acee55aea29f
+      internalID: 1284478016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 208
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cf26bea4d94aafc42813cdfa4eab98b5
+      internalID: 1959963383
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 182
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 974aaca843a22444e990a021dd8423a7
+      internalID: 1491945274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 156
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab71cedbec722ea4bb766039405348cd
+      internalID: -205957041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 130
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b0e8016f56aea54da2300c48ed4661e
+      internalID: -407814910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_9
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 104
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27c016df3d0c1ad46a6959c8dd763b39
+      internalID: -856475046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 78
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f637514732955534bad5d502bb3cb8ef
+      internalID: -8859756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_11
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 52
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 526a53a3e5f5b6e47be254f9977b0846
+      internalID: -2003974579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 26
+        width: 208
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f105eda0eae148468e29205df99b15b
+      internalID: 60300413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TimeLineBorder_13
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 18
-        height: 18
+        width: 208
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a3397a223f9d26b47842dba4d1baecf2
-      internalID: -29257057
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Walk_1
-      rect:
-        serializedVersion: 2
-        x: 18
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: eef97b6cd01019244a22d29a845f81a0
-      internalID: -927329289
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Walk_2
-      rect:
-        serializedVersion: 2
-        x: 36
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2c75bb0de393eea48a282f02fa9c74bf
-      internalID: -1431156829
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Walk_3
-      rect:
-        serializedVersion: 2
-        x: 54
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b4ce7e6f8f0475b44b439d57ee438ad1
-      internalID: -463944931
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Walk_4
-      rect:
-        serializedVersion: 2
-        x: 72
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 93dfba5d012b9e6458111d7afc8a526d
-      internalID: 669993899
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Walk_5
-      rect:
-        serializedVersion: 2
-        x: 90
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1d54aa77eede8844f929fbc928a84c18
-      internalID: 538268458
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Walk_6
-      rect:
-        serializedVersion: 2
-        x: 108
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c294c97a9174db347b98b4b5d46e5c39
-      internalID: -1457926253
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Walk_7
-      rect:
-        serializedVersion: 2
-        x: 126
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6fda604855220d74aa6094ac5b42fc54
-      internalID: 787002228
+      spriteID: e2fe3223a4c72404e8266c04ce962003
+      internalID: -1527389034
       vertices: []
       indices: 
       edges: []
@@ -292,7 +424,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: ead014450b9ba9e4797c2ab0f3d256ad
+    spriteID: 8bb46f4a7edaf344383aaf861e8fb55e
     internalID: 0
     vertices: []
     indices: 
@@ -302,14 +434,20 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      UIFrame_Walk_0: -29257057
-      UIFrame_Walk_1: -927329289
-      UIFrame_Walk_2: -1431156829
-      UIFrame_Walk_3: -463944931
-      UIFrame_Walk_4: 669993899
-      UIFrame_Walk_5: 538268458
-      UIFrame_Walk_6: -1457926253
-      UIFrame_Walk_7: 787002228
+      TimeLineBorder_0: 731159573488969213
+      TimeLineBorder_1: 1841065544
+      TimeLineBorder_10: -8859756
+      TimeLineBorder_11: -2003974579
+      TimeLineBorder_12: 60300413
+      TimeLineBorder_13: -1527389034
+      TimeLineBorder_2: 262815160
+      TimeLineBorder_3: 828465989
+      TimeLineBorder_4: 1284478016
+      TimeLineBorder_5: 1959963383
+      TimeLineBorder_6: 1491945274
+      TimeLineBorder_7: -205957041
+      TimeLineBorder_8: -407814910
+      TimeLineBorder_9: -856475046
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

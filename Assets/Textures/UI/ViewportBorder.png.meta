@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 4747d1e62fdb36948b8db7fa0b2d48f0
+guid: ebc45d37ded85bb498cfb58fd22e7b62
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 9005708737086927377
-    second: UIFrame_Jump_0
+      213: 7991863747168263806
+    second: ViewportBorder_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 18
+  spritePixelsToUnits: 30
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: UIFrame_Jump_0
+      name: ViewportBorder_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 18
-        height: 18
+        width: 30
+        height: 30
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,74 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 112b2b0d164bafc70800000000000000
-      internalID: 9005708737086927377
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Jump_1
-      rect:
-        serializedVersion: 2
-        x: 18
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1f823a649345ac641986f7b5371e2eb8
-      internalID: 1308086034
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Jump_2
-      rect:
-        serializedVersion: 2
-        x: 36
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 26c8f329e7a863a49b8322227fa32524
-      internalID: -2026818594
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UIFrame_Jump_3
-      rect:
-        serializedVersion: 2
-        x: 54
-        y: 0
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d2e764eccd2664e4e93162ade32f2c07
-      internalID: -1931094147
+      spriteID: e7e594f3cbdc8ee60800000000000000
+      internalID: 7991863747168263806
       vertices: []
       indices: 
       edges: []
@@ -204,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 3289c6bd05fc5e440887c2fdfbe4a271
+    spriteID: ef589cf9853a9924bae829a408bb42ce
     internalID: 0
     vertices: []
     indices: 
@@ -214,10 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      UIFrame_Jump_0: 9005708737086927377
-      UIFrame_Jump_1: 1308086034
-      UIFrame_Jump_2: -2026818594
-      UIFrame_Jump_3: -1931094147
+      ViewportBorder_0: 7991863747168263806
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
