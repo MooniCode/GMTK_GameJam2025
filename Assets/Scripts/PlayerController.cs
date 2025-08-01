@@ -1,4 +1,7 @@
+using System;
 using UnityEngine;
+using UnityEngine.Audio;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,6 +18,11 @@ public class PlayerController : MonoBehaviour
     public bool canWalk = false;
     public bool canJump = false;
 
+    [Header("Audio")]
+    public AudioSource playerAudioSource;
+    public AudioClip[] footstepSounds;
+    public float footstepInterval = 0.3f;
+
     // Components
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
@@ -28,10 +36,14 @@ public class PlayerController : MonoBehaviour
     private float horizontalInput;
     private bool jumpInput;
 
+    // Audio timing
+    private float lastFootstepTime;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        playerAudioSource = GetComponent<AudioSource>();
 
         // Set up rigidbody constraints
         rb.freezeRotation = true;
@@ -99,11 +111,27 @@ public class PlayerController : MonoBehaviour
         // Set horizontal velocity while preserving vertical velocity
         rb.linearVelocity = new Vector2(direction * actualSpeed, rb.linearVelocity.y);
 
+        // Play footstep sounds at intervals
+        if (Time.time - lastFootstepTime >= footstepInterval && footstepSounds.Length > 0)
+        {
+            PlayFootStepSound();
+            lastFootstepTime = Time.time;
+        }
+
         // Flip sprite based on direction
         if (direction > 0)
             spriteRenderer.flipX = false;
         else if (direction < 0)
             spriteRenderer.flipX = true;
+    }
+
+    private void PlayFootStepSound()
+    {
+        if (playerAudioSource != null && footstepSounds.Length > 0)
+        {
+            int randomIndex = Random.Range(0, footstepSounds.Length);
+            playerAudioSource.PlayOneShot(footstepSounds[randomIndex]);
+        }
     }
 
     void Jump()

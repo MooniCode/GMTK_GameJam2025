@@ -489,8 +489,12 @@ public class AnimationInterface : MonoBehaviour
     {
         List<FrameData> activeFrames = GetActiveFrames();
 
-        if (activeFrames.Count == 0)
+        // Get the required number of slots for this animation type
+        int maxSlots = GetMaxSlotsForAnimationType(currentAnimationType);
+
+        if (activeFrames.Count != maxSlots)
         {
+            Debug.Log($"Animation '{currentAnimationType}' requires {maxSlots} frames, but only {activeFrames.Count} are provided.");
             return;
         }
 
@@ -558,15 +562,16 @@ public class AnimationInterface : MonoBehaviour
     void UpdateCurrentAnimation()
     {
         List<FrameData> activeFrames = GetActiveFrames();
+        int maxSlots = GetMaxSlotsForAnimationType(currentAnimationType);
 
-        if (activeFrames.Count > 0)
+        if (activeFrames.Count == maxSlots)
         {
-            // Create/update the animation for the current type
+            // Only create/update the animation if timeline is complete
             PlayerAnimationManager.Instance.CreateCustomAnimation(currentAnimationType, activeFrames, animationSpeed);
         }
         else
         {
-            // Remove the animation if no frames left
+            // Remove the animation if timeline is incomplete
             PlayerAnimationManager.Instance.RemoveCustomAnimation(currentAnimationType);
         }
     }
