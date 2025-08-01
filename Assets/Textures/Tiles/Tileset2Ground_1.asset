@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: TX Tileset Ground_2
+  m_Name: Tileset2Ground_1
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 3994209854681936717, guid: 598457250b4619c44b2c28a6d04c3fca, type: 3}
+  m_Sprite: {fileID: 1218206581, guid: b0eb142bb0f92a64e904a8da32c7b1da, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
