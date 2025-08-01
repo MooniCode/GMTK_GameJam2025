@@ -3,19 +3,40 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
+public class AnimationTypeConfig
+{
+    public string animationType;
+    public int maxSlots;
+}
+
 public class AnimationInterface : MonoBehaviour
 {
     [Header("Main Panel")]
     public GameObject interfacePanel;
 
     [Header("Animation Preview")]
-    public Image animationPreview;
+    public Image animationPreviewCharacter;
+    public Image animationPreviewBackground;
     public float animationSpeed = 0.2f;
+
+    public Sprite animationPreviewBackgroundOnTexture;
+    public Sprite animationPreviewBackgroundOffTexture;
+
+    public Animator cameraOverlayAnimator;
 
     [Header("Timeline")]
     public Transform timelineContainer;
     public GameObject timelineSlotPrefab;
-    public int maxTimelineSlots = 6;
+
+    [Header("Animation Configuration")]
+    public List<AnimationTypeConfig> animationConfigs = new List<AnimationTypeConfig>
+    {
+        new AnimationTypeConfig { animationType = "idle", maxSlots = 3 },
+        new AnimationTypeConfig { animationType = "walk", maxSlots = 8 },
+        new AnimationTypeConfig { animationType = "jump", maxSlots = 5 },
+        new AnimationTypeConfig { animationType = "run", maxSlots = 6 }
+    };
 
     [Header("Inventory")]
     public Transform inventoryContent;
@@ -41,6 +62,15 @@ public class AnimationInterface : MonoBehaviour
         timelineSlots = new List<TimelineSlot>();
         savedTimelines = new Dictionary<string, List<FrameData>>();
 
+        // Make the alpha of the animationPreview image 0
+        Color color = animationPreviewCharacter.color;
+        color.a = 0f;
+        animationPreviewCharacter.color = color;
+
+        // Make the animationPreview background the OFF version
+        animationPreviewBackground.sprite = animationPreviewBackgroundOffTexture;
+
+        // Initialize with default animation type
         CreateTimelineSlots();
         interfacePanel.SetActive(false);
 
@@ -52,6 +82,8 @@ public class AnimationInterface : MonoBehaviour
             if (animationTypeDropdown.options.Count > 0)
             {
                 currentAnimationType = animationTypeDropdown.options[animationTypeDropdown.value].text.ToLower();
+                // Recreate timeline with correct slot count for initial animation
+                RecreateTimelineForCurrentAnimation();
             }
         }
 
@@ -111,8 +143,41 @@ public class AnimationInterface : MonoBehaviour
         string newAnimationType = animationTypeDropdown.options[dropdownIndex].text.ToLower();
         currentAnimationType = newAnimationType;
 
+        // Recreate timeline with correct slot count for new animation type
+        RecreateTimelineForCurrentAnimation();
+
         // Load timeline for new animation type
         LoadTimelineState(currentAnimationType);
+    }
+
+    void RecreateTimelineForCurrentAnimation()
+    {
+        // Clear existing timeline slots
+        ClearAllTimelineSlots();
+
+        // Create new timeline slots based on current animation type
+        CreateTimelineSlots();
+    }
+
+    void ClearAllTimelineSlots()
+    {
+        // Destroy all existing timeline slot GameObjects
+        foreach (TimelineSlot slot in timelineSlots)
+        {
+            if (slot != null && slot.gameObject != null)
+            {
+                Destroy(slot.gameObject);
+            }
+        }
+
+        // Clear the list
+        timelineSlots.Clear();
+    }
+
+    int GetMaxSlotsForAnimationType(string animationType)
+    {
+        AnimationTypeConfig config = animationConfigs.Find(c => c.animationType.ToLower() == animationType.ToLower());
+        return config != null ? config.maxSlots : 6; // Default to 6 if not found
     }
 
     void SaveCurrentTimelineState()
@@ -145,9 +210,12 @@ public class AnimationInterface : MonoBehaviour
         // Always clear current timeline first
         ClearTimelineVisuals();
 
-        // Initialize empty timeline
+        // Get the max slots for this animation type
+        int maxSlots = GetMaxSlotsForAnimationType(animationType);
+
+        // Initialize empty timeline with correct size
         timelineFrames.Clear();
-        for (int i = 0; i < maxTimelineSlots; i++)
+        for (int i = 0; i < maxSlots; i++)
         {
             timelineFrames.Add(null);
         }
@@ -157,7 +225,7 @@ public class AnimationInterface : MonoBehaviour
         {
             List<FrameData> savedTimeline = savedTimelines[animationType];
 
-            // Copy the saved timeline
+            // Copy the saved timeline (only up to the current max slots)
             for (int i = 0; i < savedTimeline.Count && i < timelineFrames.Count; i++)
             {
                 timelineFrames[i] = savedTimeline[i];
@@ -176,7 +244,7 @@ public class AnimationInterface : MonoBehaviour
         {
             // Start with completely empty timeline
             isPlaying = false;
-            animationPreview.sprite = null;
+            animationPreviewCharacter.sprite = null;
         }
 
         // Update the animation immediately after loading timeline
@@ -187,10 +255,24 @@ public class AnimationInterface : MonoBehaviour
     {
         foreach (TimelineSlot slot in timelineSlots)
         {
-            slot.SetFrameFromData(null);
+            if (slot != null)
+            {
+                slot.SetFrameFromData(null);
+            }
         }
         isPlaying = false;
-        animationPreview.sprite = null;
+        animationPreviewCharacter.sprite = null;
+
+        // Make the animationPreview background the grey version
+        animationPreviewBackground.sprite = animationPreviewBackgroundOffTexture;
+
+        // Stop the camera overlay animation
+        cameraOverlayAnimator.SetBool("isRecording", false);
+
+        // Set alpha to 0 when clearing timeline
+        Color color = animationPreviewCharacter.color;
+        color.a = 0f;
+        animationPreviewCharacter.color = color;
     }
 
     void UpdateTimelineVisuals()
@@ -212,7 +294,9 @@ public class AnimationInterface : MonoBehaviour
 
     void CreateTimelineSlots()
     {
-        for (int i = 0; i < maxTimelineSlots; i++)
+        int maxSlots = GetMaxSlotsForAnimationType(currentAnimationType);
+
+        for (int i = 0; i < maxSlots; i++)
         {
             GameObject slot = Instantiate(timelineSlotPrefab, timelineContainer);
             TimelineSlot slotScript = slot.GetComponent<TimelineSlot>();
@@ -267,6 +351,17 @@ public class AnimationInterface : MonoBehaviour
 
     void StartPreview()
     {
+        // Make the animationPreview background the ON version
+        animationPreviewBackground.sprite = animationPreviewBackgroundOnTexture;
+
+        // Play the camera overlay animation
+        cameraOverlayAnimator.SetBool("isRecording", true);
+
+        // Set the alpha of the animationPreview back to 100
+        Color color = animationPreviewCharacter.color;
+        color.a = 1f;
+        animationPreviewCharacter.color = color;
+
         isPlaying = true;
         currentPreviewFrame = 0;
         UpdatePreview();
@@ -294,12 +389,21 @@ public class AnimationInterface : MonoBehaviour
                 currentPreviewFrame = 0;
             }
 
-            animationPreview.sprite = activeFrames[currentPreviewFrame].GetAnimationSprite();
+            animationPreviewCharacter.sprite = activeFrames[currentPreviewFrame].GetAnimationSprite();
         }
         else
         {
-            // No frames to show
-            animationPreview.sprite = null;
+            // Make the animationPreview background the OFF version
+            animationPreviewBackground.sprite = animationPreviewBackgroundOffTexture;
+
+            // Stop the camera overlay animation
+            cameraOverlayAnimator.SetBool("isRecording", false);
+
+            // No frames to show - set sprite to null AND alpha to 0
+            animationPreviewCharacter.sprite = null;
+            Color color = animationPreviewCharacter.color;
+            color.a = 0f;
+            animationPreviewCharacter.color = color;
         }
     }
 
@@ -331,7 +435,18 @@ public class AnimationInterface : MonoBehaviour
         else
         {
             isPlaying = false;
-            animationPreview.sprite = null;
+            animationPreviewCharacter.sprite = null;
+
+            // Make the animationPreview background the grey version
+            animationPreviewBackground.sprite = animationPreviewBackgroundOffTexture;
+
+            // Stop the camera overlay animation
+            cameraOverlayAnimator.SetBool("isRecording", false);
+
+            // Set alpha back to 0 when no frames are left
+            Color color = animationPreviewCharacter.color;
+            color.a = 0f;
+            animationPreviewCharacter.color = color;
         }
     }
 
@@ -422,5 +537,21 @@ public class AnimationInterface : MonoBehaviour
         }
     }
 
+    // Public method to add new animation type configurations at runtime if needed
+    public void AddAnimationTypeConfig(string animationType, int maxSlots)
+    {
+        // Check if config already exists
+        AnimationTypeConfig existingConfig = animationConfigs.Find(c => c.animationType.ToLower() == animationType.ToLower());
 
+        if (existingConfig != null)
+        {
+            // Update existing config
+            existingConfig.maxSlots = maxSlots;
+        }
+        else
+        {
+            // Add new config
+            animationConfigs.Add(new AnimationTypeConfig { animationType = animationType, maxSlots = maxSlots });
+        }
+    }
 }
