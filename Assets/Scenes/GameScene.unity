@@ -2633,7 +2633,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1015403469}
   - component: {fileID: 1015403468}
-  - component: {fileID: 1015403470}
   - component: {fileID: 1015403471}
   m_Layer: 0
   m_Name: zippy_0
@@ -2712,22 +2711,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1015403470
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1015403467}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1d82c1a3c957b74f83acd6a70b97933, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startingFramePrefabs:
-  - {fileID: 4550762572735086444, guid: 17f59662703d9cc4fb9fa8781dd71021, type: 3}
-  - {fileID: 8580030042160106757, guid: 61899ca3d1188b347ad5e4ac7917009b, type: 3}
-  - {fileID: 8580030042160106757, guid: 40581898fd43c3342a0ec00436fdbe19, type: 3}
 --- !u!114 &1015403471
 MonoBehaviour:
   m_ObjectHideFlags: 0

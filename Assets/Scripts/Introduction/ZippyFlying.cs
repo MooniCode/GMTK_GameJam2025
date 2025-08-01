@@ -189,13 +189,10 @@ public class ZippyFlying : MonoBehaviour
                 // Only proceed if they have the animation AND the editor is closed AND they had opened it
                 if (hasIdleAnimation && isAnimationEditorClosed && wasAnimationEditorOpen)
                 {
-                    Debug.Log("Zippy: Player created idle animation and closed editor! Moving to walk dialogue.");
-
                     // Lock the animation editor again until walk frames are given
                     if (enableEditorControlDuringIntro && animationInterface != null)
                     {
                         animationInterface.SetEditorLocked(true);
-                        Debug.Log("Zippy: Animation editor locked until walk frames are given.");
                     }
 
                     currentState = IntroState.ShowingWalkDialogue;
@@ -247,8 +244,6 @@ public class ZippyFlying : MonoBehaviour
             return;
         }
 
-        Debug.Log("Zippy: Giving idle frames to player");
-
         // Give idle frames using prefabs (like StartingFramesManager)
         foreach (GameObject framePrefab in idleFramePrefabs)
         {
@@ -262,7 +257,6 @@ public class ZippyFlying : MonoBehaviour
                         framePickup.frameSprite,
                         framePickup.animationSprite
                     );
-                    Debug.Log($"Zippy gave frame: {framePickup.frameType}");
                 }
                 else
                 {
@@ -275,7 +269,6 @@ public class ZippyFlying : MonoBehaviour
         if (enableEditorControlDuringIntro && animationInterface != null)
         {
             animationInterface.SetEditorLocked(false);
-            Debug.Log("Zippy: Animation editor unlocked! You can now press TAB to open it.");
         }
     }
 
@@ -286,8 +279,6 @@ public class ZippyFlying : MonoBehaviour
             Debug.LogError("PlayerAnimationManager.Instance is null!");
             return;
         }
-
-        Debug.Log("Zippy: Giving walk frames to player");
 
         // Give walk frames using prefabs (like StartingFramesManager)
         foreach (GameObject framePrefab in walkFramePrefabs)
@@ -302,7 +293,6 @@ public class ZippyFlying : MonoBehaviour
                         framePickup.frameSprite,
                         framePickup.animationSprite
                     );
-                    Debug.Log($"Zippy gave frame: {framePickup.frameType}");
                 }
                 else
                 {
@@ -315,7 +305,6 @@ public class ZippyFlying : MonoBehaviour
         if (enableEditorControlDuringIntro && animationInterface != null)
         {
             animationInterface.SetEditorLocked(false);
-            Debug.Log("Zippy: Animation editor permanently unlocked! You can now use it freely.");
         }
     }
 

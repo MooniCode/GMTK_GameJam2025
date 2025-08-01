@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -165,8 +166,17 @@ public class AnimationInterface : MonoBehaviour
         // Recreate timeline with correct slot count for new animation type
         RecreateTimelineForCurrentAnimation();
 
-        // Load timeline for new animation type
-        LoadTimelineState(currentAnimationType);
+        // Load timeline state AFTER a small delay to ensure new slots are initialized
+        StartCoroutine(LoadTimelineStateDelayed(currentAnimationType));
+    }
+
+    IEnumerator LoadTimelineStateDelayed(string animationType)
+    {
+        // Wait one frame for the new timeline slots to be fully initialized
+        yield return null;
+
+        // Now load the timeline state
+        LoadTimelineState(animationType);
     }
 
     void RecreateTimelineForCurrentAnimation()
@@ -226,11 +236,11 @@ public class AnimationInterface : MonoBehaviour
 
     void LoadTimelineState(string animationType)
     {
-        // Always clear current timeline first
-        ClearTimelineVisuals();
+        Debug.Log($"Loading timeline state for: {animationType}");
 
         // Get the max slots for this animation type
         int maxSlots = GetMaxSlotsForAnimationType(animationType);
+        Debug.Log($"Max slots for {animationType}: {maxSlots}");
 
         // Initialize empty timeline with correct size
         timelineFrames.Clear();
@@ -239,18 +249,23 @@ public class AnimationInterface : MonoBehaviour
             timelineFrames.Add(null);
         }
 
-        // Only load saved timeline if it exists
+        // Check if we have saved timeline for this animation type
         if (savedTimelines.ContainsKey(animationType))
         {
             List<FrameData> savedTimeline = savedTimelines[animationType];
+            Debug.Log($"Found saved timeline for {animationType} with {savedTimeline.Count} slots");
 
             // Copy the saved timeline (only up to the current max slots)
             for (int i = 0; i < savedTimeline.Count && i < timelineFrames.Count; i++)
             {
                 timelineFrames[i] = savedTimeline[i];
+                if (savedTimeline[i] != null)
+                {
+                    Debug.Log($"Restored frame at slot {i}: {savedTimeline[i].frameType}");
+                }
             }
 
-            // Update visual slots
+            // Update visual slots - AFTER we've restored the frame data
             UpdateTimelineVisuals();
 
             // Start preview if we have frames
@@ -261,9 +276,9 @@ public class AnimationInterface : MonoBehaviour
         }
         else
         {
-            // Start with completely empty timeline
-            isPlaying = false;
-            animationPreviewCharacter.sprite = null;
+            Debug.Log($"No saved timeline found for {animationType}");
+            // Clear timeline visuals since we have no saved state
+            ClearTimelineVisuals();
         }
 
         // Update the animation immediately after loading timeline
@@ -469,7 +484,7 @@ public class AnimationInterface : MonoBehaviour
         }
     }
 
-    // NEW METHOD: Create animation from timeline (now called automatically)
+    // NEW METHOD: Create animation from timeline
     public void CreateCustomAnimation()
     {
         List<FrameData> activeFrames = GetActiveFrames();

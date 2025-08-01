@@ -124,9 +124,12 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
 
     public void SetFrameFromData(FrameData frameData)
     {
+        Debug.Log($"SetFrameFromData called for slot {slotIndex} with frame: {frameData?.frameType}");
+
         // Clean up existing draggable frame
         if (currentDraggableFrame != null)
         {
+            Debug.Log($"Destroying existing draggable frame: {currentDraggableFrame.name}");
             Destroy(currentDraggableFrame);
         }
 
@@ -134,6 +137,7 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
 
         if (frameData != null)
         {
+            Debug.Log($"Setting slot image sprite: {frameData.GetUISprite()?.name}");
             slotImage.sprite = frameData.GetUISprite();
             slotImage.color = Color.white;
 
@@ -142,18 +146,27 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
         }
         else
         {
+            Debug.Log($"Frame data is null, setting empty slot");
             SetEmptySlot();
         }
+
+        Debug.Log($"SetFrameFromData completed for slot {slotIndex}");
     }
 
     void CreateDraggableFrame(FrameData frameData)
     {
+        Debug.Log($"CreateDraggableFrame called for slot {slotIndex} with frame: {frameData?.frameType}");
+
         // Use the same prefab as inventory
         GameObject frameDisplayPrefab = animationInterface.frameDisplayPrefab;
 
         if (frameDisplayPrefab != null)
         {
+            Debug.Log($"Creating draggable frame with prefab: {frameDisplayPrefab.name}");
+
             currentDraggableFrame = Instantiate(frameDisplayPrefab, transform);
+
+            Debug.Log($"Instantiated frame GameObject: {currentDraggableFrame.name}");
 
             // Set up the draggable frame using UI sprite (same as inventory)
             Image frameImage = currentDraggableFrame.GetComponent<Image>();
@@ -161,6 +174,11 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             {
                 frameImage.sprite = frameData.GetUISprite(); // Use UI sprite (same as inventory)
                 frameImage.raycastTarget = true;
+                Debug.Log($"Set frame image sprite: {frameImage.sprite?.name}");
+            }
+            else
+            {
+                Debug.LogError($"No Image component found on instantiated frame prefab!");
             }
 
             // Ensure it has DraggableFrame component
@@ -168,6 +186,7 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             if (draggable == null)
             {
                 draggable = currentDraggableFrame.AddComponent<DraggableFrame>();
+                Debug.Log("Added DraggableFrame component");
             }
             draggable.frameData = frameData;
 
@@ -176,6 +195,7 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             if (timelineMarker == null)
             {
                 timelineMarker = currentDraggableFrame.AddComponent<TimelineSlotFrame>();
+                Debug.Log("Added TimelineSlotFrame component");
             }
             timelineMarker.originalSlot = this;
 
@@ -184,14 +204,25 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             if (oldDraggable != null)
             {
                 Destroy(oldDraggable);
+                Debug.Log("Removed old TimelineSlot component");
             }
 
             // Make it fill the slot
             RectTransform rectTransform = currentDraggableFrame.GetComponent<RectTransform>();
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
+            if (rectTransform != null)
+            {
+                rectTransform.anchorMin = Vector2.zero;
+                rectTransform.anchorMax = Vector2.one;
+                rectTransform.offsetMin = Vector2.zero;
+                rectTransform.offsetMax = Vector2.zero;
+                Debug.Log("Set RectTransform anchors and offsets");
+            }
+            else
+            {
+                Debug.LogError("No RectTransform found on instantiated frame!");
+            }
+
+            Debug.Log($"Successfully created draggable frame for slot {slotIndex}");
         }
         else
         {

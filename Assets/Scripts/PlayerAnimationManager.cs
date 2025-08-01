@@ -101,8 +101,6 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         FrameData frameData = new FrameData(frameType, frameSprite, animationSprite);
         collectedFrames.Add(frameData);
-
-        Debug.Log($"Frame added to inventory: {frameType}");
     }
 
     public void CreateCustomAnimation(string animationType, List<FrameData> frames, float frameRate)
