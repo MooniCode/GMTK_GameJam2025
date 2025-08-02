@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class ZippyFlying : MonoBehaviour
 {
+    [Header("Development Settings")]
+    public bool skipIntroduction = false;
+
     [Header("Movement Settings")]
     public float flySpeed = 5f;
     public float sineAmplitude = 0.5f;
@@ -11,7 +14,6 @@ public class ZippyFlying : MonoBehaviour
 
     [Header("Stop Settings")]
     public float stopXPosition = 3f;
-    public float waitTime = 10f;
     public float slowDownDistance = 2f; // Distance before stop to start slowing
 
     [Header("Dialogue")]
@@ -82,6 +84,13 @@ public class ZippyFlying : MonoBehaviour
 
         // Set dialogue box off screen
         dialoguePanel.transform.localPosition = new Vector3(0, -300, 0);
+
+        // Handle skip introduction
+        if (skipIntroduction)
+        {
+            SkipIntroduction();
+            return; // Exit early, no need to set up normal intro
+        }
 
         // Lock animation editor at start if control is enabled
         if (enableEditorControlDuringIntro && animationInterface != null)
@@ -225,9 +234,18 @@ public class ZippyFlying : MonoBehaviour
                 break;
 
             case IntroState.WaitingForWalkDialogue:
-                // Wait a moment for player to read the final message, then fly away
-                StartCoroutine(FlyAwayAfterDelay(3f));
-                currentState = IntroState.FlyingAway;
+                if (!dialogueFinished)
+                {
+                    // Wait for the walk dialogue to finish typing
+                    if (typewriterText != null && !typewriterText.IsTyping &&
+                        typewriterText.CurrentLineIndex >= walkDialogueLines.Count - 1)
+                    {
+                        // Dialogue is finished, now wait a moment before flying away
+                        StartCoroutine(FlyAwayAfterDelay(6f)); // Adjust delay as needed
+                        dialogueFinished = true; // Prevent this from running again
+                        currentState = IntroState.FlyingAway;
+                    }
+                }
                 break;
 
             case IntroState.FlyingAway:
@@ -437,18 +455,25 @@ public class ZippyFlying : MonoBehaviour
         flyingOffScreen = true;
     }
 
-    // Public method to manually advance the intro (for testing or dialogue system integration)
-    public void AdvanceIntro()
+    void SkipIntroduction()
     {
-        switch (currentState)
+        // Give all frames instantly
+        GiveIdleFrames();
+        GiveWalkFrames();
+
+        // Make sure animation editor is unlocked
+        if (enableEditorControlDuringIntro && animationInterface != null)
         {
-            case IntroState.WaitingForIdleAnimation:
-                if (PlayerAnimationManager.Instance != null &&
-                    PlayerAnimationManager.Instance.HasAnimation("idle"))
-                {
-                    currentState = IntroState.GivingWalkFrames;
-                }
-                break;
+            animationInterface.SetEditorLocked(false);
         }
+
+        // Set state to completed and hide/destroy Zippy
+        currentState = IntroState.FlyingAway;
+
+        // Option 1: Hide Zippy immediately
+        gameObject.SetActive(false);
+
+        // Option 2: Or destroy Zippy completely (uncomment if preferred)
+        // Destroy(gameObject);
     }
 }
