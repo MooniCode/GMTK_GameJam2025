@@ -13,7 +13,10 @@ public class AnimationTypeConfig
     [Header("Timeline Layout")]
     public int leftPadding = 0;
     public int rightPadding = 0;
-    public int spacing = 10;
+
+    [Header("Correct Animation Pattern")]
+    [Tooltip("Drag the correct frame prefabs in the right order here. Must match maxSlots count.")]
+    public AnimationFramePickup[] correctPatternPrefabs;
 }
 
 public class AnimationInterface : MonoBehaviour
@@ -56,10 +59,10 @@ public class AnimationInterface : MonoBehaviour
     [Header("Animation Configuration")]
     public List<AnimationTypeConfig> animationConfigs = new List<AnimationTypeConfig>
     {
-        new AnimationTypeConfig { animationType = "idle", maxSlots = 3, leftPadding = 100, rightPadding = 100, spacing = 15 },
-        new AnimationTypeConfig { animationType = "walk", maxSlots = 8, leftPadding = 20, rightPadding = 20, spacing = 10 },
-        new AnimationTypeConfig { animationType = "jump", maxSlots = 5, leftPadding = 60, rightPadding = 60, spacing = 12 },
-        new AnimationTypeConfig { animationType = "run", maxSlots = 6, leftPadding = 40, rightPadding = 40, spacing = 10 }
+        new AnimationTypeConfig { animationType = "idle", maxSlots = 3, leftPadding = 100, rightPadding = 100, correctPatternPrefabs = new AnimationFramePickup[3] },
+        new AnimationTypeConfig { animationType = "walk", maxSlots = 8, leftPadding = 20, rightPadding = 20, correctPatternPrefabs = new AnimationFramePickup[8] },
+        new AnimationTypeConfig { animationType = "jump", maxSlots = 4, leftPadding = 80, rightPadding = 80, correctPatternPrefabs = new AnimationFramePickup[4] },
+        new AnimationTypeConfig { animationType = "run", maxSlots = 6, leftPadding = 40, rightPadding = 40, correctPatternPrefabs = new AnimationFramePickup[6] }
     };
 
     [Header("Inventory")]
@@ -71,6 +74,9 @@ public class AnimationInterface : MonoBehaviour
 
     [Header("UI Animation Control")]
     public Animator uiAnimator; // Drag your animator here in the inspector
+
+    [Header("Player Feedback")]
+    public TMPro.TextMeshProUGUI feedbackText; // Text to show "X/Y frames correct"
 
     private List<FrameData> timelineFrames;
     private List<TimelineSlot> timelineSlots;
@@ -129,6 +135,9 @@ public class AnimationInterface : MonoBehaviour
         }
 
         SetupInventoryDropHandler();
+
+        // Validate correct patterns in development
+        ValidateCorrectPatterns();
     }
 
     void Update()
@@ -173,6 +182,7 @@ public class AnimationInterface : MonoBehaviour
         {
             RefreshInventoryDisplay();
             LoadTimelineState(currentAnimationType);
+            UpdateFeedbackText(); // Update feedback when opening interface
         }
     }
 
@@ -202,6 +212,9 @@ public class AnimationInterface : MonoBehaviour
 
         // Now load the timeline state
         LoadTimelineState(animationType);
+
+        // Refresh inventory to show frames for the new animation type
+        RefreshInventoryDisplay();
     }
 
     void RecreateTimelineForCurrentAnimation()
@@ -227,10 +240,7 @@ public class AnimationInterface : MonoBehaviour
             timelineLayoutGroup.padding.left = config.leftPadding;
             timelineLayoutGroup.padding.right = config.rightPadding;
 
-            // Update spacing if you want different spacing per animation
-            timelineLayoutGroup.spacing = config.spacing;
-
-            Debug.Log($"Updated timeline layout for {currentAnimationType}: Left={config.leftPadding}, Right={config.rightPadding}, Spacing={config.spacing}");
+            Debug.Log($"Updated timeline layout for {currentAnimationType}: Left={config.leftPadding}, Right={config.rightPadding}");
         }
         else
         {
@@ -238,7 +248,6 @@ public class AnimationInterface : MonoBehaviour
             // Set default values
             timelineLayoutGroup.padding.left = 50;
             timelineLayoutGroup.padding.right = 50;
-            timelineLayoutGroup.spacing = 10;
         }
     }
 
@@ -342,6 +351,9 @@ public class AnimationInterface : MonoBehaviour
 
         // Update the animation immediately after loading timeline
         UpdateCurrentAnimation();
+
+        // Update feedback text after loading
+        UpdateFeedbackText();
     }
 
     void ClearTimelineVisuals()
@@ -407,20 +419,36 @@ public class AnimationInterface : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // Display all collected frames using UI sprite (same as pickup)
+        // Debug logging
+        Debug.Log($"RefreshInventoryDisplay - Current Animation Type: '{currentAnimationType}'");
+        Debug.Log($"Total collected frames: {PlayerAnimationManager.Instance.collectedFrames.Count}");
+
+        // Display only frames that match the current animation type
         foreach (FrameData frameData in PlayerAnimationManager.Instance.collectedFrames)
         {
-            GameObject frameDisplay = Instantiate(frameDisplayPrefab, inventoryContent);
-            Image frameImage = frameDisplay.GetComponent<Image>();
+            Debug.Log($"Checking frame with frameType: '{frameData.frameType}' against current: '{currentAnimationType}'");
 
-            if (frameImage != null && frameData.GetUISprite() != null)
+            // Only show frames that match the current animation type
+            if (frameData.frameType.ToLower() == currentAnimationType.ToLower())
             {
-                frameImage.sprite = frameData.GetUISprite(); // Use UI sprite (same as pickup)
-            }
+                Debug.Log($"Match found! Displaying frame: {frameData.frameType}");
 
-            // Add draggable component to inventory frames
-            DraggableFrame draggable = frameDisplay.AddComponent<DraggableFrame>();
-            draggable.frameData = frameData;
+                GameObject frameDisplay = Instantiate(frameDisplayPrefab, inventoryContent);
+                Image frameImage = frameDisplay.GetComponent<Image>();
+
+                if (frameImage != null && frameData.GetUISprite() != null)
+                {
+                    frameImage.sprite = frameData.GetUISprite();
+                }
+
+                // Add draggable component to inventory frames
+                DraggableFrame draggable = frameDisplay.AddComponent<DraggableFrame>();
+                draggable.frameData = frameData;
+            }
+            else
+            {
+                Debug.Log($"No match: '{frameData.frameType.ToLower()}' != '{currentAnimationType.ToLower()}'");
+            }
         }
     }
 
@@ -434,6 +462,9 @@ public class AnimationInterface : MonoBehaviour
 
         // Add the frame data to the timeline
         timelineFrames[slotIndex] = frameData;
+
+        // Update feedback text
+        UpdateFeedbackText();
 
         // Update the animation immediately
         UpdateCurrentAnimation();
@@ -516,6 +547,9 @@ public class AnimationInterface : MonoBehaviour
         {
             timelineFrames[slotIndex] = null;
         }
+
+        // Update feedback text
+        UpdateFeedbackText();
 
         // Update the animation immediately
         UpdateCurrentAnimation();
@@ -636,7 +670,7 @@ public class AnimationInterface : MonoBehaviour
     }
 
     // Public method to add new animation type configurations at runtime if needed
-    public void AddAnimationTypeConfig(string animationType, int maxSlots, int leftPadding = 50, int rightPadding = 50, int spacing = 10)
+    public void AddAnimationTypeConfig(string animationType, int maxSlots, int leftPadding = 50, int rightPadding = 50)
     {
         // Check if config already exists
         AnimationTypeConfig existingConfig = animationConfigs.Find(c => c.animationType.ToLower() == animationType.ToLower());
@@ -647,7 +681,6 @@ public class AnimationInterface : MonoBehaviour
             existingConfig.maxSlots = maxSlots;
             existingConfig.leftPadding = leftPadding;
             existingConfig.rightPadding = rightPadding;
-            existingConfig.spacing = spacing;
         }
         else
         {
@@ -657,21 +690,19 @@ public class AnimationInterface : MonoBehaviour
                 animationType = animationType,
                 maxSlots = maxSlots,
                 leftPadding = leftPadding,
-                rightPadding = rightPadding,
-                spacing = spacing
+                rightPadding = rightPadding
             });
         }
     }
 
     // Utility method to update layout settings at runtime
-    public void UpdateLayoutForAnimation(string animationType, int leftPadding, int rightPadding, int spacing = -1)
+    public void UpdateLayoutForAnimation(string animationType, int leftPadding, int rightPadding)
     {
         AnimationTypeConfig config = animationConfigs.Find(c => c.animationType.ToLower() == animationType.ToLower());
         if (config != null)
         {
             config.leftPadding = leftPadding;
             config.rightPadding = rightPadding;
-            if (spacing >= 0) config.spacing = spacing;
 
             // If this is the current animation, update the layout immediately
             if (currentAnimationType.ToLower() == animationType.ToLower())
@@ -720,5 +751,90 @@ public class AnimationInterface : MonoBehaviour
     public void RefreshUIAnimation()
     {
         UpdateUIAnimatorParameters(currentAnimationType);
+    }
+
+    // Method to calculate and update feedback text
+    void UpdateFeedbackText()
+    {
+        if (feedbackText == null) return;
+
+        AnimationTypeConfig config = GetCurrentAnimationConfig();
+        if (config == null || config.correctPatternPrefabs == null)
+        {
+            feedbackText.text = "No pattern defined";
+            return;
+        }
+
+        int correctCount = GetCorrectFrameCount();
+        int totalSlots = config.maxSlots;
+
+        feedbackText.text = $"{correctCount}/{totalSlots} frames correct";
+
+        // Optional: Change color based on progress
+        if (correctCount == totalSlots)
+        {
+            feedbackText.color = Color.green; // Perfect!
+        }
+        else if (correctCount > totalSlots / 2)
+        {
+            feedbackText.color = Color.yellow; // Good progress
+        }
+        else
+        {
+            feedbackText.color = Color.white; // Default/needs work
+        }
+    }
+
+    // Calculate how many frames are in the correct position
+    int GetCorrectFrameCount()
+    {
+        AnimationTypeConfig config = GetCurrentAnimationConfig();
+        if (config == null || config.correctPatternPrefabs == null) return 0;
+
+        int correctCount = 0;
+
+        for (int i = 0; i < timelineFrames.Count && i < config.correctPatternPrefabs.Length; i++)
+        {
+            // Check if the frame in this slot matches the correct pattern for THIS SPECIFIC POSITION
+            if (timelineFrames[i] != null && config.correctPatternPrefabs[i] != null)
+            {
+                // Only count as correct if the RIGHT frame is in the RIGHT position
+                if (IsFrameCorrectFromPrefab(timelineFrames[i], config.correctPatternPrefabs[i]))
+                {
+                    correctCount++;
+                }
+                // If there's a frame but it's the wrong one for this position, don't count it
+            }
+            // Empty slots don't count as correct (since we expect a specific frame there)
+        }
+
+        return correctCount;
+    }
+
+    // Method to compare if frame matches the prefab's frame data
+    bool IsFrameCorrectFromPrefab(FrameData playerFrame, AnimationFramePickup correctPrefab)
+    {
+        if (correctPrefab == null) return false;
+
+        // Compare by sprite - each frame should have a unique sprite
+        return playerFrame.GetUISprite() == correctPrefab.frameSprite;
+    }
+
+    // Public method to manually refresh feedback (useful for debugging)
+    public void RefreshFeedback()
+    {
+        UpdateFeedbackText();
+    }
+
+    // Method to validate that correct patterns match slot counts
+    void ValidateCorrectPatterns()
+    {
+        foreach (var config in animationConfigs)
+        {
+            if (config.correctPatternPrefabs != null && config.correctPatternPrefabs.Length != config.maxSlots)
+            {
+                Debug.LogWarning($"Animation '{config.animationType}' has {config.maxSlots} slots but {config.correctPatternPrefabs.Length} correct pattern prefabs. These should match!");
+            }
+        }
     }
 }

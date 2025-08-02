@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9f0f616aa930df489ba30df7e9b7528, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frameType: Walk
+  frameType: Idle
   frameSprite: {fileID: 475309244, guid: e0e1b7ed1fc5f2045aece2f4e7187f8e, type: 3}
   animationSprite: {fileID: 1528878561, guid: 27619d96e8a72ca468abc95c6bb50ef2, type: 3}
   spriteRenderer: {fileID: 5334954401110619810}
