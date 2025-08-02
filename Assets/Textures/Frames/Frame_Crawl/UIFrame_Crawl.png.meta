@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e6055ab188d72c54399b3b572421343c
+guid: 4a21efb6ceebe3143930d8a420d99c2a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1229858627709956937
-    second: Projectile_0
+      213: 5382142989492430314
+    second: UIFrame_Crawl_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Projectile_0
+      name: UIFrame_Crawl_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 1
-        width: 3
-        height: 3
+        x: 0
+        y: 0
+        width: 18
+        height: 18
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,118 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7bc066b181aaeeee0800000000000000
-      internalID: -1229858627709956937
+      spriteID: ae52e0b788631ba40800000000000000
+      internalID: 5382142989492430314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UIFrame_Crawl_1
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 0
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 80d789978aa35af4a935ffe4b4959c9e
+      internalID: -1887586343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UIFrame_Crawl_2
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 0
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c8f0227b8473fc4a98de1e1f24817ff
+      internalID: -312455686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UIFrame_Crawl_3
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 0
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea72bbab02bf6654f966c539038b616c
+      internalID: -540221731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UIFrame_Crawl_4
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 0
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4da3e970d595b774e9313fdb01ccc446
+      internalID: 586728079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UIFrame_Crawl_5
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 0
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61a1a5d75bdee014e93de4313538deb6
+      internalID: -1706227666
       vertices: []
       indices: 
       edges: []
@@ -138,7 +248,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5782b9ad3bf2a4142ab08db172587342
+    spriteID: 3bf27e1df35cdbe49911742b03d7941a
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +258,12 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Projectile_0: -1229858627709956937
+      UIFrame_Crawl_0: 5382142989492430314
+      UIFrame_Crawl_1: -1887586343
+      UIFrame_Crawl_2: -312455686
+      UIFrame_Crawl_3: -540221731
+      UIFrame_Crawl_4: 586728079
+      UIFrame_Crawl_5: -1706227666
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

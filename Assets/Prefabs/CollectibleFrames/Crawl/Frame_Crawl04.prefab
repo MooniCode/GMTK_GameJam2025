@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 2701353292885968477}
   - component: {fileID: 6165309790491561556}
   - component: {fileID: 5688370133284056467}
-  - component: {fileID: 6087611486708423996}
+  - component: {fileID: 3263926649704302527}
   m_Layer: 0
-  m_Name: Frame_Jump01
+  m_Name: Frame_Crawl04
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 6674991006125716058, guid: c5c467046f3a88e419f3f9cfbf5afe27, type: 3}
+  m_Sprite: {fileID: -3724520682238282708, guid: a1a6361efe7d92f4bb31a72c6ef9474b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -102,9 +102,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9f0f616aa930df489ba30df7e9b7528, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frameType: Jump
-  frameSprite: {fileID: 9005708737086927377, guid: 4747d1e62fdb36948b8db7fa0b2d48f0, type: 3}
-  animationSprite: {fileID: 8429245631809995717, guid: 97d7bc9ba0188474da51790fac7a7106, type: 3}
+  frameType: Crawl
+  frameSprite: {fileID: -540221731, guid: 4a21efb6ceebe3143930d8a420d99c2a, type: 3}
+  animationSprite: {fileID: -6607273333072097213, guid: 2bacc7962f2305a439c22e1db13ce6d5, type: 3}
   spriteRenderer: {fileID: 2701353292885968477}
   audioSource: {fileID: 0}
   pickupSound: {fileID: 8300000, guid: b2940beae28b28144a2cfec7bf65adf9, type: 3}
@@ -154,7 +154,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.48, y: 0.48}
   m_EdgeRadius: 0
---- !u!114 &6087611486708423996
+--- !u!114 &3263926649704302527
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

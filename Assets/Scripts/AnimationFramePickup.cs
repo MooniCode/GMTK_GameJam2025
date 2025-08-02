@@ -12,6 +12,10 @@ public class AnimationFramePickup : MonoBehaviour
     [Header("Visual")]
     public SpriteRenderer spriteRenderer;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip pickupSound;
+
     private void Start()
     {
         // Set the visual sprite for the pickup
@@ -19,6 +23,9 @@ public class AnimationFramePickup : MonoBehaviour
         {
             spriteRenderer.sprite = frameSprite;
         }
+
+        // Get the player's audio source
+        audioSource = GameObject.FindWithTag("Player").GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -27,6 +34,11 @@ public class AnimationFramePickup : MonoBehaviour
         {
             // Add to player's frame collection
             PlayerAnimationManager.Instance.CollectFrame(this);
+
+            // Play pickup sounds
+            audioSource.PlayOneShot(pickupSound);
+
+            // Destroy the frame pickup
             Destroy(gameObject);
         }
     }

@@ -106,6 +106,8 @@ MonoBehaviour:
   frameSprite: {fileID: -1747502223769861060, guid: 759e98fc999e739428d1aa43fe4ed0fa, type: 3}
   animationSprite: {fileID: 1183852756387075274, guid: 99b84c92383be5c4f8ceb915b1eb1412, type: 3}
   spriteRenderer: {fileID: 2701353292885968477}
+  audioSource: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: b2940beae28b28144a2cfec7bf65adf9, type: 3}
 --- !u!61 &5688370133284056467
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -144,7 +146,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 1.125, y: 1.125}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

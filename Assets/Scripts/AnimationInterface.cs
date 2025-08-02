@@ -38,6 +38,11 @@ public class AnimationInterface : MonoBehaviour
     public Transform timelineContainer;
     public GameObject timelineSlotPrefab;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip frameDropSound;
+    public float frameDropSoundVolume = 1f;
+
     // Reference to the Horizontal Layout Group
     private HorizontalLayoutGroup timelineLayoutGroup;
 
@@ -62,7 +67,8 @@ public class AnimationInterface : MonoBehaviour
         new AnimationTypeConfig { animationType = "idle", maxSlots = 3, leftPadding = 100, rightPadding = 100, correctPatternPrefabs = new AnimationFramePickup[3] },
         new AnimationTypeConfig { animationType = "walk", maxSlots = 8, leftPadding = 20, rightPadding = 20, correctPatternPrefabs = new AnimationFramePickup[8] },
         new AnimationTypeConfig { animationType = "jump", maxSlots = 4, leftPadding = 80, rightPadding = 80, correctPatternPrefabs = new AnimationFramePickup[4] },
-        new AnimationTypeConfig { animationType = "run", maxSlots = 6, leftPadding = 40, rightPadding = 40, correctPatternPrefabs = new AnimationFramePickup[6] }
+        new AnimationTypeConfig { animationType = "prown", maxSlots = 2, leftPadding = 40, rightPadding = 40, correctPatternPrefabs = new AnimationFramePickup[2] },
+        new AnimationTypeConfig { animationType = "crawl", maxSlots = 6, leftPadding = 40, rightPadding = 40, correctPatternPrefabs = new AnimationFramePickup[6] }
     };
 
     [Header("Inventory")]
@@ -460,6 +466,8 @@ public class AnimationInterface : MonoBehaviour
             timelineFrames.Add(null);
         }
 
+        PlayFrameDropSound();
+
         // Add the frame data to the timeline
         timelineFrames[slotIndex] = frameData;
 
@@ -731,6 +739,7 @@ public class AnimationInterface : MonoBehaviour
         uiAnimator.SetBool("isInWalk", false);
         uiAnimator.SetBool("isInJump", false);
         uiAnimator.SetBool("isInProne", false);
+        uiAnimator.SetBool("isInCrawl", false);
 
         // Set the appropriate parameter to true based on current animation type
         switch (animationType.ToLower())
@@ -750,6 +759,10 @@ public class AnimationInterface : MonoBehaviour
             case "prone":
                 uiAnimator.SetBool("isInProne", true);
                 Debug.Log("UI Animator: Set isInProne to true");
+                break;
+            case "crawl":
+                uiAnimator.SetBool("isInCrawl", true);
+                Debug.Log("UI Animator: Set isInCrawl to true");
                 break;
             default:
                 Debug.LogWarning($"No UI animation parameter defined for animation type: {animationType}");
@@ -856,12 +869,22 @@ public class AnimationInterface : MonoBehaviour
                 return false; // Jump should not loop
             case "prone":
                 return false; // Prone should not loop
+            case "crawl":
+                return true; // Crawl should loop (similar to walk)
             case "idle":
                 return true;
             case "walk":
                 return true;
             default:
                 return true;  // Default to looping for other animations
+        }
+    }
+
+    void PlayFrameDropSound()
+    {
+        if (audioSource != null && frameDropSound != null)
+        {
+            audioSource.PlayOneShot(frameDropSound, frameDropSoundVolume);
         }
     }
 }
