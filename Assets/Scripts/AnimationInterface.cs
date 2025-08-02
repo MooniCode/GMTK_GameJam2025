@@ -577,7 +577,6 @@ public class AnimationInterface : MonoBehaviour
         }
     }
 
-    // NEW METHOD: Create animation from timeline
     public void CreateCustomAnimation()
     {
         List<FrameData> activeFrames = GetActiveFrames();
@@ -731,6 +730,7 @@ public class AnimationInterface : MonoBehaviour
         uiAnimator.SetBool("isInIdle", false);
         uiAnimator.SetBool("isInWalk", false);
         uiAnimator.SetBool("isInJump", false);
+        uiAnimator.SetBool("isInProne", false);
 
         // Set the appropriate parameter to true based on current animation type
         switch (animationType.ToLower())
@@ -746,6 +746,10 @@ public class AnimationInterface : MonoBehaviour
             case "jump":
                 uiAnimator.SetBool("isInJump", true);
                 Debug.Log("UI Animator: Set isInJump to true");
+                break;
+            case "prone":
+                uiAnimator.SetBool("isInProne", true);
+                Debug.Log("UI Animator: Set isInProne to true");
                 break;
             default:
                 Debug.LogWarning($"No UI animation parameter defined for animation type: {animationType}");
@@ -849,11 +853,13 @@ public class AnimationInterface : MonoBehaviour
         switch (animationType.ToLower())
         {
             case "jump":
-                return false; // Jump should NOT loop
+                return false; // Jump should not loop
+            case "prone":
+                return false; // Prone should not loop
             case "idle":
+                return true;
             case "walk":
-            case "run":
-                return true;  // These should loop
+                return true;
             default:
                 return true;  // Default to looping for other animations
         }

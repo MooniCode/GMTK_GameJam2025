@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     [Header("Unlocked Abilities")]
     public bool canWalk = false;
     public bool canJump = false;
+    public bool canProne = false;
 
     [Header("Audio")]
     public AudioSource playerAudioSource;
@@ -32,10 +33,12 @@ public class PlayerController : MonoBehaviour
     private bool wasMoving = false;
     private bool wasGrounded = false;
     private bool isJumping = false; // NEW: Track if we're currently jumping
+    private bool isProne = false; // NEW: Track if we're currently prone
 
     // Input storage for FixedUpdate
     private float horizontalInput;
     private bool jumpInput;
+    private bool proneInput;
 
     // Audio timing
     private float lastFootstepTime;
@@ -78,16 +81,25 @@ public class PlayerController : MonoBehaviour
         horizontalInput = Input.GetAxis("Horizontal");
 
         // Jumping input (check for key press)
-        if (Input.GetKeyDown(KeyCode.Space) && canJump && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && canJump && isGrounded && !isProne)
         {
             jumpInput = true;
+        }
+
+        // Check if S key is being held down (and player can prone and is grounded)
+        bool shouldBeProne = Input.GetKey(KeyCode.S) && canProne && isGrounded;
+
+        // If prone state should change, trigger the transition
+        if (shouldBeProne != isProne)
+        {
+            proneInput = true;
         }
     }
 
     void HandleMovement()
     {
-        // Walking (only if unlocked)
-        if (canWalk && Mathf.Abs(horizontalInput) > 0.1f)
+        // Walking (only if unlocked AND not prone)
+        if (canWalk && !isProne && Mathf.Abs(horizontalInput) > 0.1f)
         {
             Walk(horizontalInput);
         }
@@ -97,11 +109,18 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
 
-        // Handle jumping
+        // Handle jumping (can't jump while prone)
         if (jumpInput)
         {
             Jump();
             jumpInput = false; // Reset jump input
+        }
+
+        // Handle prone toggle
+        if (proneInput)
+        {
+            ToggleProne();
+            proneInput = false; // Reset prone input
         }
     }
 
@@ -157,6 +176,37 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void ToggleProne()
+    {
+        bool wasAlreadyProne = isProne;
+        isProne = !isProne;
+
+        // Trigger appropriate animation
+        if (isProne)
+        {
+            // Going into prone position - play normal animation
+            if (PlayerAnimationManager.Instance != null &&
+                PlayerAnimationManager.Instance.HasAnimation("prone"))
+            {
+                PlayerAnimationManager.Instance.PlayAnimation("prone", false, false); // forward animation
+            }
+        }
+        else
+        {
+            // Getting up from prone - play reverse animation
+            if (PlayerAnimationManager.Instance != null &&
+                PlayerAnimationManager.Instance.HasAnimation("prone"))
+            {
+                PlayerAnimationManager.Instance.PlayAnimation("prone", false, true); // reverse animation
+            }
+            else
+            {
+                // Fallback: Handle other standing animations if no prone animation
+                HandleAnimations();
+            }
+        }
+    }
+
     void CheckGrounded()
     {
         wasGrounded = isGrounded;
@@ -172,13 +222,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void HandleAnimations()
+    public void HandleAnimations()
     {
         if (PlayerAnimationManager.Instance == null) return;
 
         bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
 
-        // NEW: Don't interrupt jump animation while jumping OR falling
+        // Don't interrupt jump animation while jumping OR falling
         if (isJumping || (!isGrounded && rb.linearVelocity.y != 0))
         {
             // Don't change animations while in the air - let jump animation play
@@ -190,8 +240,20 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Handle ground animations only when actually grounded and not jumping
-        if (isGrounded && !isJumping)
+        // Don't interrupt prone animation while prone
+        if (isProne)
+        {
+            // Make sure prone animation is playing
+            if (PlayerAnimationManager.Instance.HasAnimation("prone") &&
+                PlayerAnimationManager.Instance.currentAnimation?.animationType != "prone")
+            {
+                PlayerAnimationManager.Instance.PlayAnimation("prone");
+            }
+            return;
+        }
+
+        // Handle ground animations only when actually grounded, not jumping, and not prone
+        if (isGrounded && !isJumping && !isProne)
         {
             if (isMoving && canWalk && PlayerAnimationManager.Instance.HasAnimation("walk"))
             {
@@ -225,6 +287,11 @@ public class PlayerController : MonoBehaviour
         canJump = true;
     }
 
+    public void UnlockProning(float qualityMultiplier)
+    {
+        canProne = true;
+    }
+
     // Called by Animation Manager when animations are removed
     public void LockWalking()
     {
@@ -240,6 +307,18 @@ public class PlayerController : MonoBehaviour
     public void LockJumping()
     {
         canJump = false;
+    }
+
+    public void LockProning()
+    {
+        canProne = false;
+
+        // If player is currently prone, force them to stand up
+        if (isProne)
+        {
+            isProne = false;
+            HandleAnimations();
+        }
     }
 
     // Visualize ground check in scene view

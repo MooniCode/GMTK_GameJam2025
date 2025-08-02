@@ -1,9 +1,11 @@
+// Enhanced PlayerAnimationManager with reverse animation support
+
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerAnimationManager : MonoBehaviour
 {
-    public static PlayerAnimationManager Instance; // Singleton reference
+    public static PlayerAnimationManager Instance;
 
     [Header("Frame Collection")]
     public List<FrameData> collectedFrames;
@@ -16,6 +18,7 @@ public class PlayerAnimationManager : MonoBehaviour
     public int currentFrameIndex = 0;
     public float animationTimer = 0f;
     public bool isAnimating = false;
+    public bool isPlayingReverse = false; // NEW: Track if playing in reverse
 
     // References to player components
     private SpriteRenderer playerSpriteRenderer;
@@ -27,7 +30,7 @@ public class PlayerAnimationManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            collectedFrames = new List<FrameData>(); // Initialize the list
+            collectedFrames = new List<FrameData>();
             createdAnimations = new List<CustomAnimation>();
         }
         else
@@ -59,7 +62,7 @@ public class PlayerAnimationManager : MonoBehaviour
 
     void Update()
     {
-        // Update current animation
+        // Update current animation (with reverse support)
         if (isAnimating && currentAnimation != null && currentAnimation.frames.Count > 0)
         {
             animationTimer += Time.deltaTime;
@@ -68,19 +71,48 @@ public class PlayerAnimationManager : MonoBehaviour
             {
                 animationTimer = 0f;
 
-                // Move to the next frame
-                currentFrameIndex++;
-
-                if (currentFrameIndex >= currentAnimation.frames.Count)
+                // Move to the next frame (forward or backward)
+                if (isPlayingReverse)
                 {
-                    if (currentAnimation.isLooping)
+                    currentFrameIndex--;
+
+                    // Handle reverse animation completion
+                    if (currentFrameIndex < 0)
                     {
-                        currentFrameIndex = 0;
+                        if (currentAnimation.isLooping)
+                        {
+                            currentFrameIndex = currentAnimation.frames.Count - 1;
+                        }
+                        else
+                        {
+                            currentFrameIndex = 0;
+                            isAnimating = false;
+                            isPlayingReverse = false;
+
+                            // After reverse prone animation completes, handle standing animations
+                            if (currentAnimation.animationType == "prone")
+                            {
+                                playerController.HandleAnimations();
+                            }
+                        }
                     }
-                    else
+                }
+                else
+                {
+                    currentFrameIndex++;
+
+                    // Handle forward animation completion
+                    if (currentFrameIndex >= currentAnimation.frames.Count)
                     {
-                        currentFrameIndex = currentAnimation.frames.Count - 1;
-                        isAnimating = false;
+                        if (currentAnimation.isLooping)
+                        {
+                            currentFrameIndex = 0;
+                        }
+                        else
+                        {
+                            currentFrameIndex = currentAnimation.frames.Count - 1;
+                            isAnimating = false;
+                        }
                     }
                 }
 
@@ -90,9 +122,43 @@ public class PlayerAnimationManager : MonoBehaviour
         }
     }
 
+    // UPDATED: Enhanced PlayAnimation method with reverse support
+    public void PlayAnimation(string animationType, bool forceRestart = false, bool playReverse = false)
+    {
+        CustomAnimation targetAnimation = createdAnimations.Find(anim => anim.animationType == animationType);
+
+        if (targetAnimation == null)
+        {
+            Debug.LogWarning($"No animation found for type: {animationType}");
+            return;
+        }
+
+        // Only change animation if it's different, we're forcing a restart, or changing direction
+        if (currentAnimation != targetAnimation || forceRestart || isPlayingReverse != playReverse)
+        {
+            currentAnimation = targetAnimation;
+            isPlayingReverse = playReverse;
+
+            // Set starting frame based on direction
+            if (playReverse)
+            {
+                currentFrameIndex = currentAnimation.frames.Count - 1; // Start from last frame
+            }
+            else
+            {
+                currentFrameIndex = 0; // Start from first frame
+            }
+
+            animationTimer = 0f;
+            isAnimating = true;
+            UpdatePlayerSprite();
+
+            Debug.Log($"Playing animation '{animationType}' - Reverse: {playReverse}, Starting frame: {currentFrameIndex}");
+        }
+    }
+
     public void CollectFrame(AnimationFramePickup frame)
     {
-        // Create a FrameData copy before the original is destroyed
         FrameData frameData = new FrameData(frame.frameType, frame.frameSprite, frame.animationSprite);
         collectedFrames.Add(frameData);
     }
@@ -121,7 +187,7 @@ public class PlayerAnimationManager : MonoBehaviour
         if (currentAnimation != null && currentAnimation.animationType == animationType)
         {
             currentAnimation = newAnimation;
-            currentFrameIndex = 0; // Reset to first frame
+            currentFrameIndex = isPlayingReverse ? newAnimation.frames.Count - 1 : 0;
             animationTimer = 0f;
             UpdatePlayerSprite();
         }
@@ -134,58 +200,46 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         if (playerController == null) return;
 
+        Debug.Log($"Unlocking ability for animation type: {animationType}");
+
         switch (animationType.ToLower())
         {
             case "walk":
-            case "run":
                 playerController.UnlockWalking(1.0f);
+                Debug.Log("Walking ability unlocked!");
                 break;
             case "jump":
                 playerController.UnlockJumping(1.0f);
+                Debug.Log("Jumping ability unlocked!");
+                break;
+            case "prone":
+                playerController.UnlockProning(1.0f);
+                Debug.Log("Prone ability unlocked!");
                 break;
             case "idle":
-                // Immediately start idle animation if player is not moving
                 if (playerRigidbody != null && playerRigidbody.linearVelocity.magnitude < 0.1f)
                 {
                     TriggerIdleAnimation();
                 }
+                Debug.Log("Idle animation available!");
                 break;
             default:
-                // No ability lock defined for animation type
+                Debug.LogWarning($"No ability unlock defined for animation type: {animationType}");
                 break;
-        }
-    }
-
-    public void PlayAnimation(string animationType, bool forceRestart = false)
-    {
-        CustomAnimation targetAnimation = createdAnimations.Find(anim => anim.animationType == animationType);
-
-        if (targetAnimation == null)
-        {
-            Debug.LogWarning($"No animation found for type: {animationType}");
-            return;
-        }
-
-        // Only change animation if it's different or we're forcing a restart
-        if (currentAnimation != targetAnimation || forceRestart)
-        {
-            currentAnimation = targetAnimation;
-            currentFrameIndex = 0;
-            animationTimer = 0f;
-            isAnimating = true;
-            UpdatePlayerSprite();
         }
     }
 
     public void StopAnimation()
     {
         isAnimating = false;
+        isPlayingReverse = false;
         currentAnimation = null;
     }
 
     void UpdatePlayerSprite()
     {
-        if (playerSpriteRenderer != null && currentAnimation != null && currentFrameIndex < currentAnimation.frames.Count)
+        if (playerSpriteRenderer != null && currentAnimation != null &&
+            currentFrameIndex >= 0 && currentFrameIndex < currentAnimation.frames.Count)
         {
             playerSpriteRenderer.sprite = currentAnimation.frames[currentFrameIndex].GetAnimationSprite();
         }
@@ -207,6 +261,11 @@ public class PlayerAnimationManager : MonoBehaviour
         PlayAnimation("idle");
     }
 
+    public void TriggerProneAnimation()
+    {
+        PlayAnimation("prone");
+    }
+
     // Check if an animation exists
     public bool HasAnimation(string animationType)
     {
@@ -215,22 +274,18 @@ public class PlayerAnimationManager : MonoBehaviour
 
     public void UseFrame(FrameData frameData)
     {
-        // Remove the frame from collected frames since it's now being used
         collectedFrames.Remove(frameData);
     }
 
     public void RemoveCustomAnimation(string animationType)
     {
-        // Remove animation from created animations list
         createdAnimations.RemoveAll(anim => anim.animationType == animationType);
 
-        // If the removed animation is currently playing, stop it
         if (currentAnimation != null && currentAnimation.animationType == animationType)
         {
             StopAnimation();
         }
 
-        // Lock the corresponding ability
         LockAbility(animationType);
     }
 
@@ -238,24 +293,31 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         if (playerController == null) return;
 
+        Debug.Log($"Locking ability for animation type: {animationType}");
+
         switch (animationType.ToLower())
         {
             case "walk":
-            case "run":
                 playerController.LockWalking();
+                Debug.Log("Walking ability locked!");
                 break;
             case "jump":
                 playerController.LockJumping();
+                Debug.Log("Jumping ability locked!");
+                break;
+            case "prone":
+                playerController.LockProning();
+                Debug.Log("Prone ability locked!");
                 break;
             case "idle":
-                // Stop idle animation if it's playing
                 if (currentAnimation != null && currentAnimation.animationType == "idle")
                 {
                     StopAnimation();
                 }
+                Debug.Log("Idle animation removed!");
                 break;
             default:
-                // No ability lock defined for animation type
+                Debug.LogWarning($"No ability lock defined for animation type: {animationType}");
                 break;
         }
     }
