@@ -197,7 +197,10 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      player wall slide 48x48_0: 3096915165689667265
+      player wall slide 48x48_1: 2773939770702202602
+      player wall slide 48x48_2: 2332718759442348045
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

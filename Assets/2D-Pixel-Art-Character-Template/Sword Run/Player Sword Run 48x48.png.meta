@@ -397,7 +397,18 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Player Sword Run 48x48_0: -4264848026063475136
+      Player Sword Run 48x48_1: -8914172602624559260
+      Player Sword Run 48x48_10: 1230332063238639635
+      Player Sword Run 48x48_2: -7001466155092874468
+      Player Sword Run 48x48_3: 2162048161086064515
+      Player Sword Run 48x48_4: -8396335173664560922
+      Player Sword Run 48x48_5: -3319568464287422662
+      Player Sword Run 48x48_6: -3022922086271165861
+      Player Sword Run 48x48_7: 1541882120131592429
+      Player Sword Run 48x48_8: -8031951077730256564
+      Player Sword Run 48x48_9: -1753030865568881783
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

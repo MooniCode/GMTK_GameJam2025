@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      player climb-back 48x48_0: 1094480889048335883
+      player climb-back 48x48_1: -8064192844921446679
+      player climb-back 48x48_2: 4312779456848709166
+      player climb-back 48x48_3: 3869848312682303922
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

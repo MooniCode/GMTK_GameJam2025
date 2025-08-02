@@ -547,7 +547,24 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Player Sword Idle 48x48_0: 4910931697729812194
+      Player Sword Idle 48x48_1: 2997866243313136591
+      Player Sword Idle 48x48_10: -6077602633417023365
+      Player Sword Idle 48x48_11: -8218479045361914352
+      Player Sword Idle 48x48_12: -1066062311090975633
+      Player Sword Idle 48x48_13: 5111820246026042156
+      Player Sword Idle 48x48_14: -3273718072653638973
+      Player Sword Idle 48x48_15: -1305177618372451444
+      Player Sword Idle 48x48_16: 6660997261534717173
+      Player Sword Idle 48x48_2: -4938302618282865221
+      Player Sword Idle 48x48_3: -2180114551739571447
+      Player Sword Idle 48x48_4: 6028588971390400559
+      Player Sword Idle 48x48_5: 4446632827236324328
+      Player Sword Idle 48x48_6: 405244587466580687
+      Player Sword Idle 48x48_7: 8405157985730778187
+      Player Sword Idle 48x48_8: 3486321142301326175
+      Player Sword Idle 48x48_9: 5524093345125309853
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

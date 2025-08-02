@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      player air spin 48x48_0: 4475931851091052225
+      player air spin 48x48_1: 8416552932599796158
+      player air spin 48x48_2: 4025672587809373630
+      player air spin 48x48_3: 1321842498378159408
+      player air spin 48x48_4: 3305256817927909367
+      player air spin 48x48_5: -9097904435338289020
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

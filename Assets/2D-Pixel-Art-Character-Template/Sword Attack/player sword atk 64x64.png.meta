@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      player sword atk 64x64_0: -1515443327239590886
+      player sword atk 64x64_1: -3574147864103055168
+      player sword atk 64x64_2: 1616662706333002066
+      player sword atk 64x64_3: -8155977850592641670
+      player sword atk 64x64_4: -7448696295597032750
+      player sword atk 64x64_5: -6644054657070424833
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

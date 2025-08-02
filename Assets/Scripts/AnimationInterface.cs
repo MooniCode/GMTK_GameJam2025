@@ -9,6 +9,11 @@ public class AnimationTypeConfig
 {
     public string animationType;
     public int maxSlots;
+
+    [Header("Timeline Layout")]
+    public int leftPadding = 0;
+    public int rightPadding = 0;
+    public int spacing = 10;
 }
 
 public class AnimationInterface : MonoBehaviour
@@ -30,6 +35,9 @@ public class AnimationInterface : MonoBehaviour
     public Transform timelineContainer;
     public GameObject timelineSlotPrefab;
 
+    // Reference to the Horizontal Layout Group
+    private HorizontalLayoutGroup timelineLayoutGroup;
+
     [Header("Editor Lock Control")]
     private bool isEditorLocked = false;
 
@@ -48,10 +56,10 @@ public class AnimationInterface : MonoBehaviour
     [Header("Animation Configuration")]
     public List<AnimationTypeConfig> animationConfigs = new List<AnimationTypeConfig>
     {
-        new AnimationTypeConfig { animationType = "idle", maxSlots = 3 },
-        new AnimationTypeConfig { animationType = "walk", maxSlots = 8 },
-        new AnimationTypeConfig { animationType = "jump", maxSlots = 5 },
-        new AnimationTypeConfig { animationType = "run", maxSlots = 6 }
+        new AnimationTypeConfig { animationType = "idle", maxSlots = 3, leftPadding = 100, rightPadding = 100, spacing = 15 },
+        new AnimationTypeConfig { animationType = "walk", maxSlots = 8, leftPadding = 20, rightPadding = 20, spacing = 10 },
+        new AnimationTypeConfig { animationType = "jump", maxSlots = 5, leftPadding = 60, rightPadding = 60, spacing = 12 },
+        new AnimationTypeConfig { animationType = "run", maxSlots = 6, leftPadding = 40, rightPadding = 40, spacing = 10 }
     };
 
     [Header("Inventory")]
@@ -60,6 +68,9 @@ public class AnimationInterface : MonoBehaviour
 
     [Header("Animation Creation")]
     public TMP_Dropdown animationTypeDropdown;
+
+    [Header("UI Animation Control")]
+    public Animator uiAnimator; // Drag your animator here in the inspector
 
     private List<FrameData> timelineFrames;
     private List<TimelineSlot> timelineSlots;
@@ -81,6 +92,13 @@ public class AnimationInterface : MonoBehaviour
         timelineSlots = new List<TimelineSlot>();
         savedTimelines = new Dictionary<string, List<FrameData>>();
 
+        // Get the Horizontal Layout Group component
+        timelineLayoutGroup = timelineContainer.GetComponent<HorizontalLayoutGroup>();
+        if (timelineLayoutGroup == null)
+        {
+            Debug.LogError("Timeline container must have a HorizontalLayoutGroup component!");
+        }
+
         // Make the alpha of the animationPreview image 0
         Color color = animationPreviewCharacter.color;
         color.a = 0f;
@@ -101,6 +119,10 @@ public class AnimationInterface : MonoBehaviour
             if (animationTypeDropdown.options.Count > 0)
             {
                 currentAnimationType = animationTypeDropdown.options[animationTypeDropdown.value].text.ToLower();
+
+                // Set initial UI animator state
+                UpdateUIAnimatorParameters(currentAnimationType);
+
                 // Recreate timeline with correct slot count for initial animation
                 RecreateTimelineForCurrentAnimation();
             }
@@ -163,6 +185,9 @@ public class AnimationInterface : MonoBehaviour
         string newAnimationType = animationTypeDropdown.options[dropdownIndex].text.ToLower();
         currentAnimationType = newAnimationType;
 
+        // Update UI animator parameters
+        UpdateUIAnimatorParameters(newAnimationType);
+
         // Recreate timeline with correct slot count for new animation type
         RecreateTimelineForCurrentAnimation();
 
@@ -184,8 +209,42 @@ public class AnimationInterface : MonoBehaviour
         // Clear existing timeline slots
         ClearAllTimelineSlots();
 
+        // Update layout group settings for current animation type
+        UpdateTimelineLayoutForCurrentAnimation();
+
         // Create new timeline slots based on current animation type
         CreateTimelineSlots();
+    }
+
+    void UpdateTimelineLayoutForCurrentAnimation()
+    {
+        if (timelineLayoutGroup == null) return;
+
+        AnimationTypeConfig config = GetCurrentAnimationConfig();
+        if (config != null)
+        {
+            // Update padding
+            timelineLayoutGroup.padding.left = config.leftPadding;
+            timelineLayoutGroup.padding.right = config.rightPadding;
+
+            // Update spacing if you want different spacing per animation
+            timelineLayoutGroup.spacing = config.spacing;
+
+            Debug.Log($"Updated timeline layout for {currentAnimationType}: Left={config.leftPadding}, Right={config.rightPadding}, Spacing={config.spacing}");
+        }
+        else
+        {
+            Debug.LogWarning($"No config found for animation type: {currentAnimationType}");
+            // Set default values
+            timelineLayoutGroup.padding.left = 50;
+            timelineLayoutGroup.padding.right = 50;
+            timelineLayoutGroup.spacing = 10;
+        }
+    }
+
+    AnimationTypeConfig GetCurrentAnimationConfig()
+    {
+        return animationConfigs.Find(c => c.animationType.ToLower() == currentAnimationType.ToLower());
     }
 
     void ClearAllTimelineSlots()
@@ -577,7 +636,7 @@ public class AnimationInterface : MonoBehaviour
     }
 
     // Public method to add new animation type configurations at runtime if needed
-    public void AddAnimationTypeConfig(string animationType, int maxSlots)
+    public void AddAnimationTypeConfig(string animationType, int maxSlots, int leftPadding = 50, int rightPadding = 50, int spacing = 10)
     {
         // Check if config already exists
         AnimationTypeConfig existingConfig = animationConfigs.Find(c => c.animationType.ToLower() == animationType.ToLower());
@@ -586,11 +645,80 @@ public class AnimationInterface : MonoBehaviour
         {
             // Update existing config
             existingConfig.maxSlots = maxSlots;
+            existingConfig.leftPadding = leftPadding;
+            existingConfig.rightPadding = rightPadding;
+            existingConfig.spacing = spacing;
         }
         else
         {
             // Add new config
-            animationConfigs.Add(new AnimationTypeConfig { animationType = animationType, maxSlots = maxSlots });
+            animationConfigs.Add(new AnimationTypeConfig
+            {
+                animationType = animationType,
+                maxSlots = maxSlots,
+                leftPadding = leftPadding,
+                rightPadding = rightPadding,
+                spacing = spacing
+            });
         }
+    }
+
+    // Utility method to update layout settings at runtime
+    public void UpdateLayoutForAnimation(string animationType, int leftPadding, int rightPadding, int spacing = -1)
+    {
+        AnimationTypeConfig config = animationConfigs.Find(c => c.animationType.ToLower() == animationType.ToLower());
+        if (config != null)
+        {
+            config.leftPadding = leftPadding;
+            config.rightPadding = rightPadding;
+            if (spacing >= 0) config.spacing = spacing;
+
+            // If this is the current animation, update the layout immediately
+            if (currentAnimationType.ToLower() == animationType.ToLower())
+            {
+                UpdateTimelineLayoutForCurrentAnimation();
+            }
+        }
+    }
+
+    // Method to update UI Animator parameters based on current animation type
+    void UpdateUIAnimatorParameters(string animationType)
+    {
+        if (uiAnimator == null)
+        {
+            Debug.LogWarning("UI Animator is not assigned in AnimationInterface!");
+            return;
+        }
+
+        // Reset all animation type parameters to false
+        uiAnimator.SetBool("isInIdle", false);
+        uiAnimator.SetBool("isInWalk", false);
+        uiAnimator.SetBool("isInJump", false);
+
+        // Set the appropriate parameter to true based on current animation type
+        switch (animationType.ToLower())
+        {
+            case "idle":
+                uiAnimator.SetBool("isInIdle", true);
+                Debug.Log("UI Animator: Set isInIdle to true");
+                break;
+            case "walk":
+                uiAnimator.SetBool("isInWalk", true);
+                Debug.Log("UI Animator: Set isInWalk to true");
+                break;
+            case "jump":
+                uiAnimator.SetBool("isInJump", true);
+                Debug.Log("UI Animator: Set isInJump to true");
+                break;
+            default:
+                Debug.LogWarning($"No UI animation parameter defined for animation type: {animationType}");
+                break;
+        }
+    }
+
+    // Public method to manually trigger UI animation update (useful for debugging)
+    public void RefreshUIAnimation()
+    {
+        UpdateUIAnimatorParameters(currentAnimationType);
     }
 }

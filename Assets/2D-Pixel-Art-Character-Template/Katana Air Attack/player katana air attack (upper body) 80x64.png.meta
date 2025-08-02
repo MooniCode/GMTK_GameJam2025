@@ -347,7 +347,16 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      player katana air attack (upper body) 80x64_0: -2852204877311182162
+      player katana air attack (upper body) 80x64_1: -8703374436250835530
+      player katana air attack (upper body) 80x64_2: 3332694933977214753
+      player katana air attack (upper body) 80x64_3: -2210968731430921807
+      player katana air attack (upper body) 80x64_4: 2866935187493212553
+      player katana air attack (upper body) 80x64_5: -3823184146377864
+      player katana air attack (upper body) 80x64_6: -4346437573787765366
+      player katana air attack (upper body) 80x64_7: -2222553751839138856
+      player katana air attack (upper body) 80x64_8: -7867672892860160323
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

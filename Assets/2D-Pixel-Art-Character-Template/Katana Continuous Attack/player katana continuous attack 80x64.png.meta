@@ -347,7 +347,16 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      player katana continuous attack 80x64_0: 6768895310804992788
+      player katana continuous attack 80x64_1: -7465316735303243656
+      player katana continuous attack 80x64_2: -3934771436587813544
+      player katana continuous attack 80x64_3: 3156304238382823820
+      player katana continuous attack 80x64_4: 3993068899459606258
+      player katana continuous attack 80x64_5: -2427646852707415045
+      player katana continuous attack 80x64_6: -8594523477657771431
+      player katana continuous attack 80x64_7: 6306184786978839668
+      player katana continuous attack 80x64_8: -3542120026856641781
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

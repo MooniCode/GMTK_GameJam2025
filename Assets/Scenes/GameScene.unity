@@ -938,15 +938,28 @@ MonoBehaviour:
   animationConfigs:
   - animationType: idle
     maxSlots: 3
+    leftPadding: -875
+    rightPadding: 289
+    spacing: 15
   - animationType: walk
     maxSlots: 8
+    leftPadding: -880
+    rightPadding: -880
+    spacing: 10
   - animationType: jump
     maxSlots: 4
+    leftPadding: -874
+    rightPadding: 61
+    spacing: 12
   - animationType: run
     maxSlots: 6
+    leftPadding: 0
+    rightPadding: 0
+    spacing: 10
   inventoryContent: {fileID: 1024958816}
   frameDisplayPrefab: {fileID: 7861614891265209578, guid: c65fc21f21e4010419ce6381e09943dc, type: 3}
   animationTypeDropdown: {fileID: 887439895}
+  uiAnimator: {fileID: 536880447}
 --- !u!4 &403080207
 Transform:
   m_ObjectHideFlags: 0
@@ -1623,6 +1636,7 @@ GameObject:
   - component: {fileID: 536880446}
   - component: {fileID: 536880445}
   - component: {fileID: 536880447}
+  - component: {fileID: 536880448}
   m_Layer: 5
   m_Name: Timeline
   m_TagString: Untagged
@@ -1663,7 +1677,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1710,6 +1724,61 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!212 &536880448
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536880443}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: -7487057233942264548, guid: 3e249b9cd33c8f2419ecade7251148da, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 8, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
 --- !u!1 &568424022
 GameObject:
   m_ObjectHideFlags: 0
@@ -6247,8 +6316,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: -880
-    m_Right: -880
+    m_Left: 0
+    m_Right: 0
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4

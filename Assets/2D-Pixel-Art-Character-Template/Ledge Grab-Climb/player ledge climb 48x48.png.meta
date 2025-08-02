@@ -247,7 +247,12 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      player ledge climb 48x48_0: 3522507906057288993
+      player ledge climb 48x48_1: 6123127812961114044
+      player ledge climb 48x48_2: 4784795892626462178
+      player ledge climb 48x48_3: 6625061313643340871
+      player ledge climb 48x48_4: -4115667525400299754
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

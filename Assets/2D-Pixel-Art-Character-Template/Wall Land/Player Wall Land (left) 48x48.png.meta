@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Player Wall Land (left) 48x48_0: 7278251308498688862
+      Player Wall Land (left) 48x48_1: -6926113622108890258
+      Player Wall Land (left) 48x48_2: -3150760848296058548
+      Player Wall Land (left) 48x48_3: -2998674793895378946
+      Player Wall Land (left) 48x48_4: 8191127858716189997
+      Player Wall Land (left) 48x48_5: -1560629980006644607
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

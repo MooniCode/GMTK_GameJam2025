@@ -372,7 +372,17 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Player Sword Stab 96x48_0: 4661208832251774292
+      Player Sword Stab 96x48_1: 4645292053894225418
+      Player Sword Stab 96x48_2: -3002138240834869839
+      Player Sword Stab 96x48_3: -8128441958396685932
+      Player Sword Stab 96x48_4: -1847232795752203903
+      Player Sword Stab 96x48_5: -5732418113725227913
+      Player Sword Stab 96x48_6: 8925545257664592915
+      Player Sword Stab 96x48_7: 6343909700024957237
+      Player Sword Stab 96x48_8: -3900824501343763322
+      Player Sword Stab 96x48_9: 54281275661510042
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
