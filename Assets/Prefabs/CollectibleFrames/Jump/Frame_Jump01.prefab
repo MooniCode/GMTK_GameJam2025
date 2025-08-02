@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2701353292885968477}
   - component: {fileID: 6165309790491561556}
   - component: {fileID: 5688370133284056467}
+  - component: {fileID: 6087611486708423996}
   m_Layer: 0
   m_Name: Frame_Jump01
   m_TagString: Untagged
@@ -151,3 +152,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.48, y: 0.48}
   m_EdgeRadius: 0
+--- !u!114 &6087611486708423996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4550762572735086444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2208e957ad85f847a7dc95b8ffadb11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frequency: 0.3
+  amplitude: 0.1
+  phaseOffset: 0

@@ -26,14 +26,19 @@ public class PlayerController : MonoBehaviour
 
     // Components
     private Rigidbody2D rb;
+    private BoxCollider2D col;
     private SpriteRenderer spriteRenderer;
+
+    // Collider
+    private Vector2 originalColliderSize;
+    private Vector2 originalColliderOffset;
 
     // Movement variables
     private bool isGrounded;
     private bool wasMoving = false;
     private bool wasGrounded = false;
-    private bool isJumping = false; // NEW: Track if we're currently jumping
-    private bool isProne = false; // NEW: Track if we're currently prone
+    private bool isJumping = false;
+    private bool isProne = false;
 
     // Input storage for FixedUpdate
     private float horizontalInput;
@@ -48,6 +53,14 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         playerAudioSource = GetComponent<AudioSource>();
+        col = GetComponent<BoxCollider2D>();
+
+        // Store original collider values
+        if (col != null)
+        {
+            originalColliderSize = col.size;
+            originalColliderOffset = col.offset;
+        }
 
         // Set up rigidbody constraints
         rb.freezeRotation = true;
@@ -98,8 +111,12 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
-        // Walking (only if unlocked AND not prone)
-        if (canWalk && !isProne && Mathf.Abs(horizontalInput) > 0.1f)
+        // Walking (only if unlocked AND not prone AND not playing reverse transition)
+        bool canCurrentlyWalk = canWalk && !isProne &&
+                               (PlayerAnimationManager.Instance == null ||
+                                !PlayerAnimationManager.Instance.IsPlayingReverseTransition);
+
+        if (canCurrentlyWalk && Mathf.Abs(horizontalInput) > 0.1f)
         {
             Walk(horizontalInput);
         }
@@ -107,12 +124,30 @@ public class PlayerController : MonoBehaviour
         {
             // Stop horizontal movement while preserving vertical velocity
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+
+            // Debug feedback for why movement is blocked
+            if (Mathf.Abs(horizontalInput) > 0.1f)
+            {
+                if (!canWalk)
+                    Debug.Log("Movement blocked: Walking not unlocked");
+                else if (isProne)
+                    Debug.Log("Movement blocked: Player is prone");
+                else if (PlayerAnimationManager.Instance != null && PlayerAnimationManager.Instance.IsPlayingReverseTransition)
+                    Debug.Log("Movement blocked: Reverse transition playing");
+            }
         }
 
-        // Handle jumping (can't jump while prone)
+        // Handle jumping (can't jump while prone OR during reverse transition)
         if (jumpInput)
         {
-            Jump();
+            bool canCurrentlyJump = canJump && isGrounded && !isProne &&
+                                   (PlayerAnimationManager.Instance == null ||
+                                    !PlayerAnimationManager.Instance.IsPlayingReverseTransition);
+
+            if (canCurrentlyJump)
+            {
+                Jump();
+            }
             jumpInput = false; // Reset jump input
         }
 
@@ -165,7 +200,7 @@ public class PlayerController : MonoBehaviour
         // Set vertical velocity
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpVelocity);
 
-        // NEW: Set jumping state
+        // Set jumping state
         isJumping = true;
 
         // Trigger jump animation if available
@@ -180,6 +215,9 @@ public class PlayerController : MonoBehaviour
     {
         bool wasAlreadyProne = isProne;
         isProne = !isProne;
+
+        // Update collider size based on prone state
+        UpdateColliderSize();
 
         // Trigger appropriate animation
         if (isProne)
@@ -207,6 +245,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void UpdateColliderSize()
+    {
+        if (col == null) return;
+
+        if (isProne)
+        {
+            // Shrink collider for prone position
+            col.offset = new Vector2(0.03f, -0.22f);
+            col.size = new Vector2(0.78f, 0.53f);
+        }
+        else
+        {
+            // Restore original collider size when standing
+            col.offset = originalColliderOffset;
+            col.size = originalColliderSize;
+        }
+    }
+
     void CheckGrounded()
     {
         wasGrounded = isGrounded;
@@ -214,7 +270,7 @@ public class PlayerController : MonoBehaviour
         // Check if player is touching ground using overlap circle
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayerMask);
 
-        // NEW: Reset jumping state when we land
+        // Reset jumping state when we land
         if (!wasGrounded && isGrounded)
         {
             isJumping = false;
@@ -222,9 +278,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Make HandleAnimations public so PlayerAnimationManager can call it after reverse prone animation
     public void HandleAnimations()
     {
         if (PlayerAnimationManager.Instance == null) return;
+
+        // NEW: Don't interrupt reverse transition animations
+        if (PlayerAnimationManager.Instance.IsPlayingReverseTransition)
+        {
+            Debug.Log("HandleAnimations blocked - reverse transition playing");
+            return;
+        }
 
         bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
 
@@ -280,22 +344,26 @@ public class PlayerController : MonoBehaviour
     public void UnlockWalking(float qualityMultiplier)
     {
         canWalk = true;
+        Debug.Log($"Walking unlocked! canWalk = {canWalk}");
     }
 
     public void UnlockJumping(float qualityMultiplier)
     {
         canJump = true;
+        Debug.Log($"Jumping unlocked! canJump = {canJump}");
     }
 
     public void UnlockProning(float qualityMultiplier)
     {
         canProne = true;
+        Debug.Log($"Prone unlocked! canProne = {canProne}");
     }
 
     // Called by Animation Manager when animations are removed
     public void LockWalking()
     {
         canWalk = false;
+        Debug.Log($"Walking locked! canWalk = {canWalk}");
 
         // If player is currently moving, stop them
         if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
@@ -307,11 +375,13 @@ public class PlayerController : MonoBehaviour
     public void LockJumping()
     {
         canJump = false;
+        Debug.Log($"Jumping locked! canJump = {canJump}");
     }
 
     public void LockProning()
     {
         canProne = false;
+        Debug.Log($"Prone locked! canProne = {canProne}");
 
         // If player is currently prone, force them to stand up
         if (isProne)

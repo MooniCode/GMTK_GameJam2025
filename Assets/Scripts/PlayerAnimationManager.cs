@@ -1,5 +1,3 @@
-// Enhanced PlayerAnimationManager with reverse animation support
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +16,11 @@ public class PlayerAnimationManager : MonoBehaviour
     public int currentFrameIndex = 0;
     public float animationTimer = 0f;
     public bool isAnimating = false;
-    public bool isPlayingReverse = false; // NEW: Track if playing in reverse
+    public bool isPlayingReverse = false;
+    public bool isPlayingReverseTransition = false;
+
+    // Public property to check if reverse transition is playing
+    public bool IsPlayingReverseTransition => isPlayingReverseTransition;
 
     // References to player components
     private SpriteRenderer playerSpriteRenderer;
@@ -92,6 +94,7 @@ public class PlayerAnimationManager : MonoBehaviour
                             // After reverse prone animation completes, handle standing animations
                             if (currentAnimation.animationType == "prone")
                             {
+                                isPlayingReverseTransition = false; // End the transition lock
                                 playerController.HandleAnimations();
                             }
                         }
@@ -125,6 +128,13 @@ public class PlayerAnimationManager : MonoBehaviour
     // UPDATED: Enhanced PlayAnimation method with reverse support
     public void PlayAnimation(string animationType, bool forceRestart = false, bool playReverse = false)
     {
+        // Don't interrupt reverse transition animations unless forced
+        if (isPlayingReverseTransition && !forceRestart)
+        {
+            Debug.Log($"Blocked animation '{animationType}' because reverse transition is playing");
+            return;
+        }
+
         CustomAnimation targetAnimation = createdAnimations.Find(anim => anim.animationType == animationType);
 
         if (targetAnimation == null)
@@ -138,6 +148,16 @@ public class PlayerAnimationManager : MonoBehaviour
         {
             currentAnimation = targetAnimation;
             isPlayingReverse = playReverse;
+
+            // Set the reverse transition flag for prone animations
+            if (animationType == "prone" && playReverse)
+            {
+                isPlayingReverseTransition = true;
+            }
+            else
+            {
+                isPlayingReverseTransition = false;
+            }
 
             // Set starting frame based on direction
             if (playReverse)
@@ -153,7 +173,7 @@ public class PlayerAnimationManager : MonoBehaviour
             isAnimating = true;
             UpdatePlayerSprite();
 
-            Debug.Log($"Playing animation '{animationType}' - Reverse: {playReverse}, Starting frame: {currentFrameIndex}");
+            Debug.Log($"Playing animation '{animationType}' - Reverse: {playReverse}, Starting frame: {currentFrameIndex}, Transition lock: {isPlayingReverseTransition}");
         }
     }
 
@@ -233,6 +253,7 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         isAnimating = false;
         isPlayingReverse = false;
+        isPlayingReverseTransition = false; // Reset transition lock
         currentAnimation = null;
     }
 
