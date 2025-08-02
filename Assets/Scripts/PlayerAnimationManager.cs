@@ -103,7 +103,7 @@ public class PlayerAnimationManager : MonoBehaviour
         collectedFrames.Add(frameData);
     }
 
-    public void CreateCustomAnimation(string animationType, List<FrameData> frames, float frameRate)
+    public void CreateCustomAnimation(string animationType, List<FrameData> frames, float frameRate, bool shouldLoop = true)
     {
         if (frames.Count == 0)
         {
@@ -113,8 +113,8 @@ public class PlayerAnimationManager : MonoBehaviour
         // Remove existing animation of the same type
         createdAnimations.RemoveAll(anim => anim.animationType == animationType);
 
-        // Create new animation
-        CustomAnimation newAnimation = new CustomAnimation(animationType, frames, frameRate);
+        // Create new animation with specified looping behavior
+        CustomAnimation newAnimation = new CustomAnimation(animationType, frames, frameRate, shouldLoop);
         createdAnimations.Add(newAnimation);
 
         // If this animation type is currently playing, update it immediately

@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private bool wasMoving = false;
     private bool wasGrounded = false;
+    private bool isJumping = false; // NEW: Track if we're currently jumping
 
     // Input storage for FixedUpdate
     private float horizontalInput;
@@ -145,6 +146,9 @@ public class PlayerController : MonoBehaviour
         // Set vertical velocity
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpVelocity);
 
+        // NEW: Set jumping state
+        isJumping = true;
+
         // Trigger jump animation if available
         if (PlayerAnimationManager.Instance != null &&
             PlayerAnimationManager.Instance.HasAnimation("jump"))
@@ -160,10 +164,11 @@ public class PlayerController : MonoBehaviour
         // Check if player is touching ground using overlap circle
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayerMask);
 
-        // If we just landed, handle landing
+        // NEW: Reset jumping state when we land
         if (!wasGrounded && isGrounded)
         {
-            HandleAnimations();
+            isJumping = false;
+            HandleAnimations(); // Handle landing animations
         }
     }
 
@@ -173,15 +178,20 @@ public class PlayerController : MonoBehaviour
 
         bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
 
-        // Don't interrupt jump animation while in air
-        if (!isGrounded && PlayerAnimationManager.Instance.HasAnimation("jump"))
+        // NEW: Don't interrupt jump animation while jumping OR falling
+        if (isJumping || (!isGrounded && rb.linearVelocity.y != 0))
         {
-            // Jump animation is already handled in Jump() method
+            // Don't change animations while in the air - let jump animation play
+            if (PlayerAnimationManager.Instance.HasAnimation("jump") &&
+                PlayerAnimationManager.Instance.currentAnimation?.animationType != "jump")
+            {
+                PlayerAnimationManager.Instance.TriggerJumpAnimation();
+            }
             return;
         }
 
-        // Handle ground animations
-        if (isGrounded)
+        // Handle ground animations only when actually grounded and not jumping
+        if (isGrounded && !isJumping)
         {
             if (isMoving && canWalk && PlayerAnimationManager.Instance.HasAnimation("walk"))
             {

@@ -594,8 +594,11 @@ public class AnimationInterface : MonoBehaviour
         // Determine animation type based on dropdown or frame analysis
         string animationType = DetermineAnimationType(activeFrames);
 
-        // Create the custom animation
-        PlayerAnimationManager.Instance.CreateCustomAnimation(animationType, activeFrames, animationSpeed);
+        // Determine if this animation should loop
+        bool shouldLoop = ShouldAnimationLoop(animationType);
+
+        // Create the custom animation with looping setting
+        PlayerAnimationManager.Instance.CreateCustomAnimation(animationType, activeFrames, animationSpeed, shouldLoop);
     }
 
     void ClearTimeline()
@@ -659,8 +662,11 @@ public class AnimationInterface : MonoBehaviour
 
         if (activeFrames.Count == maxSlots)
         {
+            // Determine if this animation should loop
+            bool shouldLoop = ShouldAnimationLoop(currentAnimationType);
+
             // Only create/update the animation if timeline is complete
-            PlayerAnimationManager.Instance.CreateCustomAnimation(currentAnimationType, activeFrames, animationSpeed);
+            PlayerAnimationManager.Instance.CreateCustomAnimation(currentAnimationType, activeFrames, animationSpeed, shouldLoop);
         }
         else
         {
@@ -835,6 +841,21 @@ public class AnimationInterface : MonoBehaviour
             {
                 Debug.LogWarning($"Animation '{config.animationType}' has {config.maxSlots} slots but {config.correctPatternPrefabs.Length} correct pattern prefabs. These should match!");
             }
+        }
+    }
+
+    bool ShouldAnimationLoop(string animationType)
+    {
+        switch (animationType.ToLower())
+        {
+            case "jump":
+                return false; // Jump should NOT loop
+            case "idle":
+            case "walk":
+            case "run":
+                return true;  // These should loop
+            default:
+                return true;  // Default to looping for other animations
         }
     }
 }
