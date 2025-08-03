@@ -37,7 +37,6 @@ public class ZippyFlying : MonoBehaviour
         "Excellent work! You've mastered the idle animation!",
         "Now you're ready for the next step.",
         "Here are your WALK frames - these will let you move around!",
-        "Create a walk animation and you'll be able to explore the world!",
         "Good luck on your adventure!"
     };
 
@@ -416,7 +415,7 @@ public class ZippyFlying : MonoBehaviour
     IEnumerator HideDialogueBox()
     {
         Vector3 startPos = dialoguePanel.transform.localPosition;
-        Vector3 endPos = new Vector3(0, -300, 0);
+        Vector3 endPos = new Vector3(0, -400, 0);
         float elapsed = 0f;
 
         while (elapsed < dialogueAnimationDuration)

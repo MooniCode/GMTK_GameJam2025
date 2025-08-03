@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float baseWalkSpeed = 5f;
+    public float baseCrawlSpeed = 2f; // Crawling is slower than walking
     public float baseJumpHeight = 3f;
 
     [Header("Ground Detection")]
@@ -18,11 +19,13 @@ public class PlayerController : MonoBehaviour
     public bool canWalk = false;
     public bool canJump = false;
     public bool canProne = false;
+    public bool canCrawl = false;
 
     [Header("Audio")]
     public AudioSource playerAudioSource;
     public AudioClip[] footstepSounds;
     public float footstepInterval = 0.3f;
+    public float crawlSoundInterval = 0.5f; // Crawling sounds are slower
 
     // Components
     private Rigidbody2D rb;
@@ -38,12 +41,14 @@ public class PlayerController : MonoBehaviour
     private bool wasMoving = false;
     private bool wasGrounded = false;
     private bool isJumping = false;
-    private bool isProne = false;
+    private bool isProne = false; // True when crouched (either static prone or crawling)
+    private bool isCrawling = false; // True when moving while crouched
 
     // Input storage for FixedUpdate
     private float horizontalInput;
     private bool jumpInput;
-    private bool proneInput;
+    private bool proneHeld; // S key held down
+    private bool pronePressed; // S key just pressed
 
     // Audio timing
     private float lastFootstepTime;
@@ -90,51 +95,86 @@ public class PlayerController : MonoBehaviour
 
     void HandleInput()
     {
-        // Capture input for use in FixedUpdate
-        horizontalInput = Input.GetAxis("Horizontal");
+        // Capture horizontal input for movement (AZERTY keyboard: Q and D)
+        // On AZERTY: Q is where A is on QWERTY, D is in the same position
+        float qInput = Input.GetKey(KeyCode.A) ? -1f : 0f; // AZERTY Q (physical A position)
+        float dInput = Input.GetKey(KeyCode.D) ? 1f : 0f;  // AZERTY D (same position)
+        horizontalInput = qInput + dInput;
 
-        // Jumping input (check for key press)
+        // Jumping input (check for key press) - can't jump while prone
         if (Input.GetKeyDown(KeyCode.Space) && canJump && isGrounded && !isProne)
         {
             jumpInput = true;
         }
 
-        // Check if S key is being held down (and player can prone and is grounded)
-        bool shouldBeProne = Input.GetKey(KeyCode.S) && canProne && isGrounded;
+        // Prone input handling
+        proneHeld = Input.GetKey(KeyCode.S) && canProne && isGrounded;
+        pronePressed = Input.GetKeyDown(KeyCode.S) && canProne && isGrounded;
 
-        // If prone state should change, trigger the transition
-        if (shouldBeProne != isProne)
+        // Update prone state based on S key
+        if (pronePressed && !isProne)
         {
-            proneInput = true;
+            // Start crouching
+            isProne = true;
+            UpdateColliderSize();
+        }
+        else if (!proneHeld && isProne)
+        {
+            // Stop crouching (S key released)
+            isProne = false;
+            isCrawling = false; // Also stop crawling
+            UpdateColliderSize();
+        }
+
+        // Update crawling state (only when prone and moving)
+        if (isProne && canCrawl && Mathf.Abs(horizontalInput) > 0.1f)
+        {
+            isCrawling = true;
+        }
+        else if (isProne)
+        {
+            isCrawling = false; // Static prone
         }
     }
 
     void HandleMovement()
     {
-        // Walking (only if unlocked AND not prone AND not playing reverse transition)
+        // Determine current movement capabilities
         bool canCurrentlyWalk = canWalk && !isProne &&
                                (PlayerAnimationManager.Instance == null ||
                                 !PlayerAnimationManager.Instance.IsPlayingReverseTransition);
 
-        if (canCurrentlyWalk && Mathf.Abs(horizontalInput) > 0.1f)
+        bool canCurrentlyCrawl = canCrawl && isProne && isCrawling &&
+                                (PlayerAnimationManager.Instance == null ||
+                                 !PlayerAnimationManager.Instance.IsPlayingReverseTransition);
+
+        // Handle movement based on current state
+        if (Mathf.Abs(horizontalInput) > 0.1f)
         {
-            Walk(horizontalInput);
+            if (canCurrentlyCrawl)
+            {
+                Crawl(horizontalInput);
+            }
+            else if (canCurrentlyWalk)
+            {
+                Walk(horizontalInput);
+            }
+            else if (isProne && !canCrawl)
+            {
+                // Player is prone but can't crawl - stop movement
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+                Debug.Log("Can't move while prone - need crawl ability!");
+            }
+            else
+            {
+                // Stop horizontal movement while preserving vertical velocity
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            }
         }
         else
         {
             // Stop horizontal movement while preserving vertical velocity
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-
-            // Debug feedback for why movement is blocked
-            if (Mathf.Abs(horizontalInput) > 0.1f)
-            {
-                if (!canWalk)
-                    Debug.Log("Movement blocked: Walking not unlocked");
-                else if (isProne)
-                    Debug.Log("Movement blocked: Player is prone");
-                else if (PlayerAnimationManager.Instance != null && PlayerAnimationManager.Instance.IsPlayingReverseTransition)
-                    Debug.Log("Movement blocked: Reverse transition playing");
-            }
         }
 
         // Handle jumping (can't jump while prone OR during reverse transition)
@@ -150,13 +190,6 @@ public class PlayerController : MonoBehaviour
             }
             jumpInput = false; // Reset jump input
         }
-
-        // Handle prone toggle
-        if (proneInput)
-        {
-            ToggleProne();
-            proneInput = false; // Reset prone input
-        }
     }
 
     void Walk(float direction)
@@ -170,6 +203,27 @@ public class PlayerController : MonoBehaviour
         if (Time.time - lastFootstepTime >= footstepInterval && footstepSounds.Length > 0)
         {
             PlayFootStepSound();
+            lastFootstepTime = Time.time;
+        }
+
+        // Flip sprite based on direction
+        if (direction > 0)
+            spriteRenderer.flipX = false;
+        else if (direction < 0)
+            spriteRenderer.flipX = true;
+    }
+
+    void Crawl(float direction)
+    {
+        float actualSpeed = baseCrawlSpeed;
+
+        // Set horizontal velocity while preserving vertical velocity
+        rb.linearVelocity = new Vector2(direction * actualSpeed, rb.linearVelocity.y);
+
+        // Play crawl sounds at intervals (slower than footsteps)
+        if (Time.time - lastFootstepTime >= crawlSoundInterval && footstepSounds.Length > 0)
+        {
+            PlayFootStepSound(); // Using same sound for now, but could be different
             lastFootstepTime = Time.time;
         }
 
@@ -211,47 +265,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void ToggleProne()
-    {
-        bool wasAlreadyProne = isProne;
-        isProne = !isProne;
-
-        // Update collider size based on prone state
-        UpdateColliderSize();
-
-        // Trigger appropriate animation
-        if (isProne)
-        {
-            // Going into prone position - play normal animation
-            if (PlayerAnimationManager.Instance != null &&
-                PlayerAnimationManager.Instance.HasAnimation("prone"))
-            {
-                PlayerAnimationManager.Instance.PlayAnimation("prone", false, false); // forward animation
-            }
-        }
-        else
-        {
-            // Getting up from prone - play reverse animation
-            if (PlayerAnimationManager.Instance != null &&
-                PlayerAnimationManager.Instance.HasAnimation("prone"))
-            {
-                PlayerAnimationManager.Instance.PlayAnimation("prone", false, true); // reverse animation
-            }
-            else
-            {
-                // Fallback: Handle other standing animations if no prone animation
-                HandleAnimations();
-            }
-        }
-    }
-
     private void UpdateColliderSize()
     {
         if (col == null) return;
 
         if (isProne)
         {
-            // Shrink collider for prone position
+            // Shrink collider for prone/crawl position
             col.offset = new Vector2(0.03f, -0.22f);
             col.size = new Vector2(0.78f, 0.53f);
         }
@@ -283,7 +303,7 @@ public class PlayerController : MonoBehaviour
     {
         if (PlayerAnimationManager.Instance == null) return;
 
-        // NEW: Don't interrupt reverse transition animations
+        // Don't interrupt reverse transition animations
         if (PlayerAnimationManager.Instance.IsPlayingReverseTransition)
         {
             Debug.Log("HandleAnimations blocked - reverse transition playing");
@@ -304,19 +324,29 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Don't interrupt prone animation while prone
+        // Handle crouched state (prone or crawling)
         if (isProne)
         {
-            // Make sure prone animation is playing
-            if (PlayerAnimationManager.Instance.HasAnimation("prone") &&
-                PlayerAnimationManager.Instance.currentAnimation?.animationType != "prone")
+            if (isCrawling && isMoving && PlayerAnimationManager.Instance.HasAnimation("crawl"))
             {
-                PlayerAnimationManager.Instance.PlayAnimation("prone");
+                // Player is moving while crouched - play crawl animation
+                if (PlayerAnimationManager.Instance.currentAnimation?.animationType != "crawl")
+                {
+                    PlayerAnimationManager.Instance.TriggerCrawlAnimation();
+                }
+            }
+            else if (!isCrawling && PlayerAnimationManager.Instance.HasAnimation("prone"))
+            {
+                // Player is stationary while crouched - play prone animation
+                if (PlayerAnimationManager.Instance.currentAnimation?.animationType != "prone")
+                {
+                    PlayerAnimationManager.Instance.TriggerProneAnimation();
+                }
             }
             return;
         }
 
-        // Handle ground animations only when actually grounded, not jumping, and not prone
+        // Handle standing animations (not crouched, not jumping)
         if (isGrounded && !isJumping && !isProne)
         {
             if (isMoving && canWalk && PlayerAnimationManager.Instance.HasAnimation("walk"))
@@ -359,6 +389,12 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Prone unlocked! canProne = {canProne}");
     }
 
+    public void UnlockCrawling(float qualityMultiplier)
+    {
+        canCrawl = true;
+        Debug.Log($"Crawling unlocked! canCrawl = {canCrawl}");
+    }
+
     // Called by Animation Manager when animations are removed
     public void LockWalking()
     {
@@ -366,7 +402,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Walking locked! canWalk = {canWalk}");
 
         // If player is currently moving, stop them
-        if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
+        if (Mathf.Abs(rb.linearVelocity.x) > 0.1f && !isProne)
         {
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
@@ -387,7 +423,23 @@ public class PlayerController : MonoBehaviour
         if (isProne)
         {
             isProne = false;
+            isCrawling = false;
+            UpdateColliderSize();
             HandleAnimations();
+        }
+    }
+
+    public void LockCrawling()
+    {
+        canCrawl = false;
+        Debug.Log($"Crawling locked! canCrawl = {canCrawl}");
+
+        // If player is currently crawling, they can stay prone but can't move
+        if (isCrawling)
+        {
+            isCrawling = false;
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); // Stop movement
+            HandleAnimations(); // Switch back to prone animation
         }
     }
 

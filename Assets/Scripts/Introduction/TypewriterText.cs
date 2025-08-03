@@ -11,13 +11,19 @@ public class TypewriterText : MonoBehaviour
     public List<string> textLines = new List<string>();
 
     [Header("Typing Settings")]
-    [Range(0.01f, 0.2f)]
     public float typingSpeed = 0.05f;
     public float delayBetweenLines = 1f;
     public bool startOnAwake = true;
     public bool loopText = false;
     [Range(0f, 10f)]
     public float initialDelay = 2f; // New delay setting
+
+    [Header("Click Protection")]
+    [Range(0.1f, 2f)]
+    public float clickCooldown = 0.3f; // Minimum time between clicks
+    [Range(0f, 2f)]
+    public float advanceDelay = 0.5f; // Time to wait after typing finishes before allowing advance
+    public bool requireDoubleClickToAdvance = false; // Optional: require double-click to advance
 
     [Header("Audio (Optional)")]
     public AudioSource audioSource;
@@ -41,6 +47,11 @@ public class TypewriterText : MonoBehaviour
     private bool isPaused = false;
     private Coroutine typingCoroutine;
     private int lastSoundIndex = -1;
+
+    // Click protection variables
+    private float lastClickTime = 0f;
+    private float typingFinishedTime = 0f;
+    private bool canAdvance = false;
 
     void Start()
     {
@@ -83,6 +94,7 @@ public class TypewriterText : MonoBehaviour
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);
 
+        canAdvance = false; // Reset advance capability
         typingCoroutine = StartCoroutine(TypeText());
     }
 
@@ -113,7 +125,15 @@ public class TypewriterText : MonoBehaviour
             StopAllCoroutines();
             SetDisplayText(textLines[currentLineIndex]);
             isTyping = false;
+            typingFinishedTime = Time.time;
+            StartCoroutine(EnableAdvanceAfterDelay());
         }
+    }
+
+    private IEnumerator EnableAdvanceAfterDelay()
+    {
+        yield return new WaitForSeconds(advanceDelay);
+        canAdvance = true;
     }
 
     public void PauseTyping()
@@ -157,10 +177,23 @@ public class TypewriterText : MonoBehaviour
         }
 
         isTyping = false;
+        typingFinishedTime = Time.time;
 
-        // Auto-advance to next line after a delay
-        yield return new WaitForSeconds(delayBetweenLines);
-        NextLine();
+        // Enable advancement after delay
+        StartCoroutine(EnableAdvanceAfterDelay());
+
+        // Auto-advance to next line after a longer delay (only if we're at the end)
+        if (currentLineIndex >= textLines.Count - 1 && !loopText)
+        {
+            // Don't auto-advance on the last line
+            yield break;
+        }
+
+        yield return new WaitForSeconds(delayBetweenLines + advanceDelay);
+        if (!isTyping) // Make sure we haven't started typing again
+        {
+            NextLine();
+        }
     }
 
     private IEnumerator BlinkCursor()
@@ -238,6 +271,20 @@ public class TypewriterText : MonoBehaviour
         audioSource.pitch = originalPitch;
     }
 
+    private bool CanProcessClick()
+    {
+        // Check if enough time has passed since last click
+        if (Time.time - lastClickTime < clickCooldown)
+            return false;
+
+        // If we're typing, always allow skipping
+        if (isTyping)
+            return true;
+
+        // If not typing, check if we can advance
+        return canAdvance;
+    }
+
     // Public methods for external control
     public bool IsTyping => isTyping;
     public int CurrentLineIndex => currentLineIndex;
@@ -245,22 +292,35 @@ public class TypewriterText : MonoBehaviour
 
     void Update()
     {
-        // Optional: Skip typing with spacebar
+        // Handle input with click protection
+        bool inputReceived = false;
+
+        // Check for spacebar
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (isTyping)
-                SkipToEnd();
-            else
-                NextLine();
+            inputReceived = true;
         }
 
-        // Handle mouse clicks to skip/advance text
+        // Check for mouse click
         if (Input.GetMouseButtonDown(0)) // Left mouse button
         {
+            inputReceived = true;
+        }
+
+        // Process input if received and allowed
+        if (inputReceived && CanProcessClick())
+        {
+            lastClickTime = Time.time;
+
             if (isTyping)
+            {
                 SkipToEnd();
-            else
+            }
+            else if (canAdvance)
+            {
+                canAdvance = false; // Prevent immediate re-advancement
                 NextLine();
+            }
         }
     }
 }

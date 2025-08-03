@@ -32,13 +32,21 @@ public class PlayerCameraController : MonoBehaviour
     public float lookAheadDistance = 3f;
     public float lookAheadSpeed = 2f;
 
+    [Header("Dynamic Y Offset")]
+    public float lowYThreshold = -2f;
+    public float lowYOffset = -1f;
+
     // Private variables
     private Vector3 velocity = Vector3.zero;
     private Vector3 targetPosition;
     private float currentLookAhead = 0f;
+    private Vector3 originalOffset;
 
     private void Start()
     {
+        // Store the original offset
+        originalOffset = offset;
+
         // Set initial position
         if (target != null)
         {
@@ -50,8 +58,15 @@ public class PlayerCameraController : MonoBehaviour
     {
         if (target == null) return;
 
-        // Calculate base target position
-        targetPosition = target.position + offset;
+        // Adjust Y offset based on player position
+        Vector3 currentOffset = originalOffset;
+        if (target.position.y < lowYThreshold)
+        {
+            currentOffset.y = lowYOffset;
+        }
+
+        // Calculate base target position with dynamic offset
+        targetPosition = target.position + currentOffset;
 
         // Apply look ahead
         if (useLookAhead)
@@ -152,6 +167,7 @@ public class PlayerCameraController : MonoBehaviour
     public void SetOffset(Vector3 newOffset)
     {
         offset = newOffset;
+        originalOffset = newOffset;
     }
 
     public void ShakeCamera(float intensity, float duration)

@@ -236,6 +236,10 @@ public class PlayerAnimationManager : MonoBehaviour
                 playerController.UnlockProning(1.0f);
                 Debug.Log("Prone ability unlocked!");
                 break;
+            case "crawl":
+                playerController.UnlockCrawling(1.0f);
+                Debug.Log("Crawling ability unlocked!");
+                break;
             case "idle":
                 if (playerRigidbody != null && playerRigidbody.linearVelocity.magnitude < 0.1f)
                 {
@@ -287,6 +291,11 @@ public class PlayerAnimationManager : MonoBehaviour
         PlayAnimation("prone");
     }
 
+    public void TriggerCrawlAnimation()
+    {
+        PlayAnimation("crawl");
+    }
+
     // Check if an animation exists
     public bool HasAnimation(string animationType)
     {
@@ -329,6 +338,10 @@ public class PlayerAnimationManager : MonoBehaviour
             case "prone":
                 playerController.LockProning();
                 Debug.Log("Prone ability locked!");
+                break;
+            case "crawl":
+                playerController.LockCrawling();
+                Debug.Log("Crawling ability locked!");
                 break;
             case "idle":
                 if (currentAnimation != null && currentAnimation.animationType == "idle")
