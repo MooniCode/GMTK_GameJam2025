@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class EnemyProjectile : MonoBehaviour
 {
@@ -15,20 +14,15 @@ public class EnemyProjectile : MonoBehaviour
     {
         if (spriteRenderer == null) return;
 
-        // Get the projectile's velocity to determine direction
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            // Flip sprite to face the direction of movement
-            // Assuming default sprite faces right - adjust this logic if your sprite faces left by default
             if (rb.linearVelocity.x < 0)
             {
-                // Moving left, keep original orientation
                 spriteRenderer.flipX = false;
             }
             else
             {
-                // Moving right, so flip the sprite
                 spriteRenderer.flipX = true;
             }
         }
@@ -38,15 +32,18 @@ public class EnemyProjectile : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            // Trigger death instead of reloading scene
+            if (PlayerDeathManager.Instance != null)
+            {
+                PlayerDeathManager.Instance.TriggerDeath();
+            }
+
             // Destroy the projectile
             Destroy(gameObject);
-            // For now just reload the scene
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         if (other.CompareTag("Ground"))
         {
-            // Destroy the projectile
             Destroy(gameObject);
         }
     }

@@ -21,6 +21,9 @@ public class PlayerController : MonoBehaviour
     public bool canProne = false;
     public bool canCrawl = false;
 
+    [Header("Movement Control")]
+    private bool canMove = true; // For death system control
+
     [Header("Audio")]
     public AudioSource playerAudioSource;
     public AudioClip[] footstepSounds;
@@ -82,6 +85,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!canMove) return; // Death system check
+
         CheckGrounded();
         HandleInput();
         HandleAnimations();
@@ -89,12 +94,32 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!canMove) return; // Death system check
+
         // Handle physics-based movement in FixedUpdate
         HandleMovement();
     }
 
+    // Method to enable/disable player movement (for death system)
+    public void SetCanMove(bool canMove)
+    {
+        this.canMove = canMove;
+
+        // If movement is disabled, stop all input processing
+        if (!canMove)
+        {
+            // Stop any current movement
+            if (rb != null)
+            {
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); // Keep Y velocity for gravity
+            }
+        }
+    }
+
     void HandleInput()
     {
+        if (!canMove) return; // Death system check
+
         // Capture horizontal input for movement (AZERTY keyboard: Q and D)
         // On AZERTY: Q is where A is on QWERTY, D is in the same position
         float qInput = Input.GetKey(KeyCode.A) ? -1f : 0f; // AZERTY Q (physical A position)
@@ -139,6 +164,8 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
+        if (!canMove) return; // Death system check
+
         // Determine current movement capabilities
         bool canCurrentlyWalk = canWalk && !isProne &&
                                (PlayerAnimationManager.Instance == null ||
@@ -194,6 +221,8 @@ public class PlayerController : MonoBehaviour
 
     void Walk(float direction)
     {
+        if (!canMove) return; // Death system check
+
         float actualSpeed = baseWalkSpeed;
 
         // Set horizontal velocity while preserving vertical velocity
@@ -215,6 +244,8 @@ public class PlayerController : MonoBehaviour
 
     void Crawl(float direction)
     {
+        if (!canMove) return; // Death system check
+
         float actualSpeed = baseCrawlSpeed;
 
         // Set horizontal velocity while preserving vertical velocity
@@ -245,6 +276,8 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
+        if (!canMove) return; // Death system check
+
         float actualJumpHeight = baseJumpHeight;
 
         // Calculate jump velocity needed to reach desired height
