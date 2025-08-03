@@ -10,10 +10,32 @@ public class PlayerController : MonoBehaviour
     public float baseCrawlSpeed = 2f; // Crawling is slower than walking
     public float baseJumpHeight = 3f;
 
+    [Header("Quality Modifiers")]
+    public float walkSpeedQuality = 1.0f;
+    public float jumpHeightQuality = 1.0f;
+    public float proneColliderQuality = 1.0f;
+    public float crawlColliderQuality = 1.0f;
+
+    [Header("Quality Settings")]
+    [Range(0.3f, 1.0f)]
+    public float minQualityMultiplier = 0.3f; // Minimum performance at lowest quality
+
+    // Collider settings for quality-based prone/crawl
+    private Vector2 perfectProneColliderSize = new Vector2(0.78f, 0.53f);
+    private Vector2 perfectProneColliderOffset = new Vector2(0.03f, -0.22f);
+    private Vector2 poorProneColliderSize = new Vector2(0.78f, 0.73f); // Higher collider for poor quality
+    private Vector2 poorProneColliderOffset = new Vector2(0.03f, -0.12f);
+
     [Header("Ground Detection")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayerMask = 1;
+
+    [Header("Overhead Detection")]
+    public Transform overheadCheck;
+    public float overheadCheckDistance = 0.5f; // Distance to check above player
+    public float overheadCheckWidth = 0.6f; // Width of the overhead check
+    public LayerMask overheadLayerMask = 1; // What layers count as obstacles above
 
     [Header("Unlocked Abilities")]
     public bool canWalk = false;
@@ -46,6 +68,7 @@ public class PlayerController : MonoBehaviour
     private bool isJumping = false;
     private bool isProne = false; // True when crouched (either static prone or crawling)
     private bool isCrawling = false; // True when moving while crouched
+    private bool isObstructedAbove = false; // True when there's a collider above preventing standing
 
     // Input storage for FixedUpdate
     private float horizontalInput;
@@ -81,6 +104,15 @@ public class PlayerController : MonoBehaviour
             groundCheckObj.transform.localPosition = new Vector3(0, -0.5f, 0);
             groundCheck = groundCheckObj.transform;
         }
+
+        // Create overhead check point if it doesn't exist
+        if (overheadCheck == null)
+        {
+            GameObject overheadCheckObj = new GameObject("OverheadCheck");
+            overheadCheckObj.transform.SetParent(transform);
+            overheadCheckObj.transform.localPosition = new Vector3(0, 0.5f, 0);
+            overheadCheck = overheadCheckObj.transform;
+        }
     }
 
     void Update()
@@ -88,6 +120,7 @@ public class PlayerController : MonoBehaviour
         if (!canMove) return; // Death system check
 
         CheckGrounded();
+        CheckOverheadObstruction();
         HandleInput();
         HandleAnimations();
     }
@@ -116,6 +149,38 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void CheckOverheadObstruction()
+    {
+        if (overheadCheck == null) return;
+
+        // Use a box cast to check for obstacles above the player
+        // This checks if the player would collide with something if they tried to stand up
+        Vector2 boxSize = new Vector2(overheadCheckWidth, 0.1f);
+        Vector2 castDirection = Vector2.up;
+
+        // Cast from the player's current position upward
+        RaycastHit2D hit = Physics2D.BoxCast(
+            overheadCheck.position,
+            boxSize,
+            0f,
+            castDirection,
+            overheadCheckDistance,
+            overheadLayerMask
+        );
+
+        isObstructedAbove = hit.collider != null;
+
+        // Debug visualization (remove in production if desired)
+        if (isObstructedAbove)
+        {
+            Debug.DrawRay(overheadCheck.position, castDirection * hit.distance, Color.red);
+        }
+        else
+        {
+            Debug.DrawRay(overheadCheck.position, castDirection * overheadCheckDistance, Color.green);
+        }
+    }
+
     void HandleInput()
     {
         if (!canMove) return; // Death system check
@@ -136,19 +201,26 @@ public class PlayerController : MonoBehaviour
         proneHeld = Input.GetKey(KeyCode.S) && canProne && isGrounded;
         pronePressed = Input.GetKeyDown(KeyCode.S) && canProne && isGrounded;
 
-        // Update prone state based on S key
+        // Update prone state based on S key and overhead obstruction
         if (pronePressed && !isProne)
         {
             // Start crouching
             isProne = true;
             UpdateColliderSize();
         }
-        else if (!proneHeld && isProne)
+        else if (!proneHeld && isProne && !isObstructedAbove)
         {
-            // Stop crouching (S key released)
+            // Stop crouching (S key released AND no obstruction above)
             isProne = false;
             isCrawling = false; // Also stop crawling
             UpdateColliderSize();
+        }
+        else if (!proneHeld && isProne && isObstructedAbove)
+        {
+            // Player wants to stand but can't due to obstruction - keep them prone
+            // This prevents the player from standing up in tight spaces
+            // No need to change isProne state, just continue being prone
+            Debug.Log("Can't stand up - obstruction above!");
         }
 
         // Update crawling state (only when prone and moving)
@@ -223,7 +295,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!canMove) return; // Death system check
 
-        float actualSpeed = baseWalkSpeed;
+        float actualSpeed = baseWalkSpeed * walkSpeedQuality;
 
         // Set horizontal velocity while preserving vertical velocity
         rb.linearVelocity = new Vector2(direction * actualSpeed, rb.linearVelocity.y);
@@ -278,7 +350,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!canMove) return; // Death system check
 
-        float actualJumpHeight = baseJumpHeight;
+        float actualJumpHeight = baseJumpHeight * jumpHeightQuality;
 
         // Calculate jump velocity needed to reach desired height
         // Using: v = sqrt(2 * g * h) where g is gravity (positive value)
@@ -304,9 +376,17 @@ public class PlayerController : MonoBehaviour
 
         if (isProne)
         {
-            // Shrink collider for prone/crawl position
-            col.offset = new Vector2(0.03f, -0.22f);
-            col.size = new Vector2(0.78f, 0.53f);
+            // Determine which quality to use (prone or crawl)
+            float qualityToUse = isCrawling ? crawlColliderQuality : proneColliderQuality;
+
+            // Interpolate between poor and perfect collider settings based on quality
+            Vector2 colliderSize = Vector2.Lerp(poorProneColliderSize, perfectProneColliderSize, qualityToUse);
+            Vector2 colliderOffset = Vector2.Lerp(poorProneColliderOffset, perfectProneColliderOffset, qualityToUse);
+
+            col.size = colliderSize;
+            col.offset = colliderOffset;
+
+            Debug.Log($"Prone collider updated - Quality: {qualityToUse:F2}, Size: {colliderSize}, Offset: {colliderOffset}");
         }
         else
         {
@@ -368,9 +448,18 @@ public class PlayerController : MonoBehaviour
                     PlayerAnimationManager.Instance.TriggerCrawlAnimation();
                 }
             }
-            else if (!isCrawling && PlayerAnimationManager.Instance.HasAnimation("prone"))
+            else if (canCrawl && PlayerAnimationManager.Instance.HasAnimation("prone"))
             {
-                // Player is stationary while crouched - play prone animation
+                // Player is stationary while crouched but has crawl ability - use prone animation
+                // This shows a static crawl-ready pose instead of animated crawling
+                if (PlayerAnimationManager.Instance.currentAnimation?.animationType != "prone")
+                {
+                    PlayerAnimationManager.Instance.TriggerProneAnimation();
+                }
+            }
+            else if (!canCrawl && PlayerAnimationManager.Instance.HasAnimation("prone"))
+            {
+                // Player doesn't have crawl ability yet - use prone animation
                 if (PlayerAnimationManager.Instance.currentAnimation?.animationType != "prone")
                 {
                     PlayerAnimationManager.Instance.TriggerProneAnimation();
@@ -407,31 +496,36 @@ public class PlayerController : MonoBehaviour
     public void UnlockWalking(float qualityMultiplier)
     {
         canWalk = true;
-        Debug.Log($"Walking unlocked! canWalk = {canWalk}");
+        walkSpeedQuality = Mathf.Clamp(qualityMultiplier, minQualityMultiplier, 1.0f);
+        Debug.Log($"Walking unlocked! canWalk = {canWalk}, quality = {walkSpeedQuality:F2}");
     }
 
     public void UnlockJumping(float qualityMultiplier)
     {
         canJump = true;
-        Debug.Log($"Jumping unlocked! canJump = {canJump}");
+        jumpHeightQuality = Mathf.Clamp(qualityMultiplier, minQualityMultiplier, 1.0f);
+        Debug.Log($"Jumping unlocked! canJump = {canJump}, quality = {jumpHeightQuality:F2}");
     }
 
     public void UnlockProning(float qualityMultiplier)
     {
         canProne = true;
-        Debug.Log($"Prone unlocked! canProne = {canProne}");
+        proneColliderQuality = Mathf.Clamp(qualityMultiplier, minQualityMultiplier, 1.0f);
+        Debug.Log($"Prone unlocked! canProne = {canProne}, quality = {proneColliderQuality:F2}");
     }
 
     public void UnlockCrawling(float qualityMultiplier)
     {
         canCrawl = true;
-        Debug.Log($"Crawling unlocked! canCrawl = {canCrawl}");
+        crawlColliderQuality = Mathf.Clamp(qualityMultiplier, minQualityMultiplier, 1.0f);
+        Debug.Log($"Crawling unlocked! canCrawl = {canCrawl}, quality = {crawlColliderQuality:F2}");
     }
 
     // Called by Animation Manager when animations are removed
     public void LockWalking()
     {
         canWalk = false;
+        walkSpeedQuality = 1.0f; // Reset to default
         Debug.Log($"Walking locked! canWalk = {canWalk}");
 
         // If player is currently moving, stop them
@@ -444,16 +538,18 @@ public class PlayerController : MonoBehaviour
     public void LockJumping()
     {
         canJump = false;
+        jumpHeightQuality = 1.0f; // Reset to default
         Debug.Log($"Jumping locked! canJump = {canJump}");
     }
 
     public void LockProning()
     {
         canProne = false;
+        proneColliderQuality = 1.0f; // Reset to default
         Debug.Log($"Prone locked! canProne = {canProne}");
 
-        // If player is currently prone, force them to stand up
-        if (isProne)
+        // If player is currently prone, force them to stand up (only if not obstructed)
+        if (isProne && !isObstructedAbove)
         {
             isProne = false;
             isCrawling = false;
@@ -465,6 +561,7 @@ public class PlayerController : MonoBehaviour
     public void LockCrawling()
     {
         canCrawl = false;
+        crawlColliderQuality = 1.0f; // Reset to default
         Debug.Log($"Crawling locked! canCrawl = {canCrawl}");
 
         // If player is currently crawling, they can stay prone but can't move
@@ -476,13 +573,26 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Visualize ground check in scene view
+    // Visualize ground check and overhead check in scene view
     void OnDrawGizmosSelected()
     {
         if (groundCheck != null)
         {
             Gizmos.color = isGrounded ? Color.green : Color.red;
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        }
+
+        if (overheadCheck != null)
+        {
+            // Draw overhead detection area
+            Gizmos.color = isObstructedAbove ? Color.red : Color.green;
+            Vector3 boxCenter = overheadCheck.position + Vector3.up * (overheadCheckDistance * 0.5f);
+            Vector3 boxSize = new Vector3(overheadCheckWidth, overheadCheckDistance, 0.1f);
+            Gizmos.DrawWireCube(boxCenter, boxSize);
+
+            // Draw a line showing the check direction
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(overheadCheck.position, overheadCheck.position + Vector3.up * overheadCheckDistance);
         }
     }
 }

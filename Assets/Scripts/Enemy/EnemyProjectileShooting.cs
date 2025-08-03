@@ -7,20 +7,52 @@ public class EnemyProjectileShooter : MonoBehaviour
     public float projectileSpeed = 1f;
     public GameObject projectileShootPoint;
 
+    [Header("Shooting Timing")]
+    public float shootInterval = 3f; // Fixed interval between shots
+    public bool autoShoot = true; // Whether to shoot automatically
+
     [Header("Player Detection")]
     public bool flipSpriteToFacePlayer = true;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip blowDart;
+
     private GameObject player;
     private bool facingRight = true; // Track which direction we're facing
+    private float nextShootTime; // When this enemy should shoot next
 
     void Start()
     {
         // Find the player by tag
         player = GameObject.FindWithTag("Player");
-
         if (player == null)
         {
             Debug.LogWarning("No GameObject with 'Player' tag found!");
+        }
+
+        // Add this to your existing Start() method
+        Animator animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            // Slightly randomize animation speed to break synchronization
+            animator.speed = Random.Range(0.9f, 1.1f);
+        }
+    }
+
+    void Update()
+    {
+        if (player != null && flipSpriteToFacePlayer)
+        {
+            bool playerIsOnRight = IsPlayerOnRightSide();
+            FlipEnemyToFacePlayer(playerIsOnRight);
+        }
+
+        // Auto shooting logic
+        if (autoShoot && Time.time >= nextShootTime)
+        {
+            ShootProjectile();
+            nextShootTime = Time.time + shootInterval; // Fixed interval for next shot
         }
     }
 
@@ -46,6 +78,12 @@ public class EnemyProjectileShooter : MonoBehaviour
         if (flipSpriteToFacePlayer)
         {
             FlipEnemyToFacePlayer(playerIsOnRight);
+        }
+
+        // Play audio
+        if (audioSource != null && blowDart != null)
+        {
+            audioSource.PlayOneShot(blowDart);
         }
 
         // Instantiate the projectile at the shoot point
@@ -77,7 +115,6 @@ public class EnemyProjectileShooter : MonoBehaviour
         if (playerIsOnRight != facingRight)
         {
             facingRight = playerIsOnRight;
-
             // Flip the entire GameObject (this will flip all children too)
             // Since sprites face left by default, we flip when player is on the right
             Vector3 scale = transform.localScale;
@@ -92,16 +129,6 @@ public class EnemyProjectileShooter : MonoBehaviour
                 scale.x = -Mathf.Abs(scale.x);
             }
             transform.localScale = scale;
-        }
-    }
-
-    // Optional: Call this in Update if you want the enemy to always face the player
-    void Update()
-    {
-        if (player != null && flipSpriteToFacePlayer)
-        {
-            bool playerIsOnRight = IsPlayerOnRightSide();
-            FlipEnemyToFacePlayer(playerIsOnRight);
         }
     }
 }

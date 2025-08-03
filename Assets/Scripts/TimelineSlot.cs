@@ -142,11 +142,9 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
         }
         else
         {
-            Debug.Log($"Frame data is null, setting empty slot");
             SetEmptySlot();
         }
 
-        Debug.Log($"SetFrameFromData completed for slot {slotIndex}");
     }
 
     void CreateDraggableFrame(FrameData frameData)
@@ -175,7 +173,6 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             if (draggable == null)
             {
                 draggable = currentDraggableFrame.AddComponent<DraggableFrame>();
-                Debug.Log("Added DraggableFrame component");
             }
             draggable.frameData = frameData;
 
@@ -184,7 +181,6 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             if (timelineMarker == null)
             {
                 timelineMarker = currentDraggableFrame.AddComponent<TimelineSlotFrame>();
-                Debug.Log("Added TimelineSlotFrame component");
             }
             timelineMarker.originalSlot = this;
 
@@ -209,8 +205,6 @@ public class TimelineSlot : MonoBehaviour, IDropHandler
             {
                 Debug.LogError("No RectTransform found on instantiated frame!");
             }
-
-            Debug.Log($"Successfully created draggable frame for slot {slotIndex}");
         }
         else
         {

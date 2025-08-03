@@ -42,9 +42,11 @@ public class EnemyProjectile : MonoBehaviour
             Destroy(gameObject);
         }
 
-        if (other.CompareTag("Ground"))
+        if (other.CompareTag("Ground") || other.CompareTag("Door"))
         {
             Destroy(gameObject);
         }
+
+
     }
 }

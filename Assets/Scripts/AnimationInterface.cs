@@ -186,6 +186,24 @@ public class AnimationInterface : MonoBehaviour
 
         if (isInterfaceOpen)
         {
+            // IMPORTANT: Sync currentAnimationType with dropdown selection when opening
+            if (animationTypeDropdown != null && animationTypeDropdown.options.Count > 0)
+            {
+                string dropdownAnimationType = animationTypeDropdown.options[animationTypeDropdown.value].text.ToLower();
+
+                // Only update if different to avoid unnecessary recreation
+                if (currentAnimationType != dropdownAnimationType)
+                {
+                    currentAnimationType = dropdownAnimationType;
+
+                    // Recreate timeline with correct slot count for the selected animation type
+                    RecreateTimelineForCurrentAnimation();
+                }
+            }
+
+            // ALWAYS update UI animator when opening, regardless of whether animation type changed
+            UpdateUIAnimatorParameters(currentAnimationType);
+
             RefreshInventoryDisplay();
             LoadTimelineState(currentAnimationType);
             UpdateFeedbackText(); // Update feedback when opening interface
@@ -245,8 +263,6 @@ public class AnimationInterface : MonoBehaviour
             // Update padding
             timelineLayoutGroup.padding.left = config.leftPadding;
             timelineLayoutGroup.padding.right = config.rightPadding;
-
-            Debug.Log($"Updated timeline layout for {currentAnimationType}: Left={config.leftPadding}, Right={config.rightPadding}");
         }
         else
         {
@@ -310,11 +326,8 @@ public class AnimationInterface : MonoBehaviour
 
     void LoadTimelineState(string animationType)
     {
-        Debug.Log($"Loading timeline state for: {animationType}");
-
         // Get the max slots for this animation type
         int maxSlots = GetMaxSlotsForAnimationType(animationType);
-        Debug.Log($"Max slots for {animationType}: {maxSlots}");
 
         // Initialize empty timeline with correct size
         timelineFrames.Clear();
@@ -327,7 +340,6 @@ public class AnimationInterface : MonoBehaviour
         if (savedTimelines.ContainsKey(animationType))
         {
             List<FrameData> savedTimeline = savedTimelines[animationType];
-            Debug.Log($"Found saved timeline for {animationType} with {savedTimeline.Count} slots");
 
             // Copy the saved timeline (only up to the current max slots)
             for (int i = 0; i < savedTimeline.Count && i < timelineFrames.Count; i++)
@@ -350,7 +362,6 @@ public class AnimationInterface : MonoBehaviour
         }
         else
         {
-            Debug.Log($"No saved timeline found for {animationType}");
             // Clear timeline visuals since we have no saved state
             ClearTimelineVisuals();
         }
@@ -425,20 +436,12 @@ public class AnimationInterface : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // Debug logging
-        Debug.Log($"RefreshInventoryDisplay - Current Animation Type: '{currentAnimationType}'");
-        Debug.Log($"Total collected frames: {PlayerAnimationManager.Instance.collectedFrames.Count}");
-
         // Display only frames that match the current animation type
         foreach (FrameData frameData in PlayerAnimationManager.Instance.collectedFrames)
         {
-            Debug.Log($"Checking frame with frameType: '{frameData.frameType}' against current: '{currentAnimationType}'");
-
             // Only show frames that match the current animation type
             if (frameData.frameType.ToLower() == currentAnimationType.ToLower())
             {
-                Debug.Log($"Match found! Displaying frame: {frameData.frameType}");
-
                 GameObject frameDisplay = Instantiate(frameDisplayPrefab, inventoryContent);
                 Image frameImage = frameDisplay.GetComponent<Image>();
 
@@ -453,7 +456,7 @@ public class AnimationInterface : MonoBehaviour
             }
             else
             {
-                Debug.Log($"No match: '{frameData.frameType.ToLower()}' != '{currentAnimationType.ToLower()}'");
+                // Debug.Log($"No match: '{frameData.frameType.ToLower()}' != '{currentAnimationType.ToLower()}'");
             }
         }
     }
@@ -594,18 +597,20 @@ public class AnimationInterface : MonoBehaviour
 
         if (activeFrames.Count != maxSlots)
         {
-            Debug.Log($"Animation '{currentAnimationType}' requires {maxSlots} frames, but only {activeFrames.Count} are provided.");
             return;
         }
 
         // Determine animation type based on dropdown or frame analysis
         string animationType = DetermineAnimationType(activeFrames);
 
+        // Calculate quality based on correct frame placement
+        float quality = CalculateAnimationQuality(animationType);
+
         // Determine if this animation should loop
         bool shouldLoop = ShouldAnimationLoop(animationType);
 
-        // Create the custom animation with looping setting
-        PlayerAnimationManager.Instance.CreateCustomAnimation(animationType, activeFrames, animationSpeed, shouldLoop);
+        // Create the custom animation with quality multiplier
+        PlayerAnimationManager.Instance.CreateCustomAnimation(animationType, activeFrames, animationSpeed, shouldLoop, quality);
     }
 
     void ClearTimeline()
@@ -669,11 +674,14 @@ public class AnimationInterface : MonoBehaviour
 
         if (activeFrames.Count == maxSlots)
         {
+            // Calculate quality
+            float quality = CalculateAnimationQuality(currentAnimationType);
+
             // Determine if this animation should loop
             bool shouldLoop = ShouldAnimationLoop(currentAnimationType);
 
             // Only create/update the animation if timeline is complete
-            PlayerAnimationManager.Instance.CreateCustomAnimation(currentAnimationType, activeFrames, animationSpeed, shouldLoop);
+            PlayerAnimationManager.Instance.CreateCustomAnimation(currentAnimationType, activeFrames, animationSpeed, shouldLoop, quality);
         }
         else
         {
@@ -734,40 +742,46 @@ public class AnimationInterface : MonoBehaviour
             return;
         }
 
-        // Reset all animation type parameters to false
+        // Force the animator to update immediately to ensure it's not in a transitional state
+        uiAnimator.Update(0f);
+
+        // Reset all animation type parameters to false FIRST
         uiAnimator.SetBool("isInIdle", false);
         uiAnimator.SetBool("isInWalk", false);
         uiAnimator.SetBool("isInJump", false);
         uiAnimator.SetBool("isInProne", false);
         uiAnimator.SetBool("isInCrawl", false);
 
+        // Force the animator to process these changes
+        uiAnimator.Update(0f);
+
         // Set the appropriate parameter to true based on current animation type
         switch (animationType.ToLower())
         {
             case "idle":
                 uiAnimator.SetBool("isInIdle", true);
-                Debug.Log("UI Animator: Set isInIdle to true");
                 break;
             case "walk":
                 uiAnimator.SetBool("isInWalk", true);
-                Debug.Log("UI Animator: Set isInWalk to true");
                 break;
             case "jump":
                 uiAnimator.SetBool("isInJump", true);
-                Debug.Log("UI Animator: Set isInJump to true");
                 break;
             case "prone":
                 uiAnimator.SetBool("isInProne", true);
-                Debug.Log("UI Animator: Set isInProne to true");
                 break;
             case "crawl":
                 uiAnimator.SetBool("isInCrawl", true);
-                Debug.Log("UI Animator: Set isInCrawl to true");
                 break;
             default:
                 Debug.LogWarning($"No UI animation parameter defined for animation type: {animationType}");
                 break;
         }
+
+        // Force the animator to process the new state immediately
+        uiAnimator.Update(0f);
+
+        Debug.Log($"UI Animator updated to: {animationType}");
     }
 
     // Public method to manually trigger UI animation update (useful for debugging)
@@ -790,21 +804,27 @@ public class AnimationInterface : MonoBehaviour
 
         int correctCount = GetCorrectFrameCount();
         int totalSlots = config.maxSlots;
+        float quality = CalculateAnimationQuality(currentAnimationType);
+        int qualityPercentage = Mathf.RoundToInt(quality * 100f);
 
         feedbackText.text = $"{correctCount}/{totalSlots} frames correct";
 
-        // Optional: Change color based on progress
-        if (correctCount == totalSlots)
+        // Color coding based on quality
+        if (quality >= 0.9f)
         {
-            feedbackText.color = Color.green; // Perfect!
+            feedbackText.color = Color.green; // Excellent (90%+)
         }
-        else if (correctCount > totalSlots / 2)
+        else if (quality >= 0.7f)
         {
-            feedbackText.color = Color.yellow; // Good progress
+            feedbackText.color = Color.yellow; // Good (70%+)
+        }
+        else if (quality >= 0.5f)
+        {
+            feedbackText.color = new Color(1f, 0.5f, 0f); // Orange - Poor (50%+)
         }
         else
         {
-            feedbackText.color = Color.white; // Default/needs work
+            feedbackText.color = Color.red; // Very poor (below 50%)
         }
     }
 
@@ -886,5 +906,25 @@ public class AnimationInterface : MonoBehaviour
         {
             audioSource.PlayOneShot(frameDropSound, frameDropSoundVolume);
         }
+    }
+
+    public float CalculateAnimationQuality(string animationType)
+    {
+        AnimationTypeConfig config = GetCurrentAnimationConfig();
+        if (config == null || config.correctPatternPrefabs == null)
+        {
+            return 0.3f; // Minimum quality when no pattern is defined
+        }
+
+        int correctCount = GetCorrectFrameCount();
+        int totalSlots = config.maxSlots;
+
+        if (totalSlots == 0) return 0.3f; // Prevent division by zero
+
+        // Calculate quality as percentage, with minimum of 30% and maximum of 100%
+        float qualityPercentage = (float)correctCount / totalSlots;
+        float quality = Mathf.Lerp(0.3f, 1.0f, qualityPercentage);
+
+        return quality;
     }
 }

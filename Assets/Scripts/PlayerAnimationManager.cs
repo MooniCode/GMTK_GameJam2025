@@ -19,6 +19,9 @@ public class PlayerAnimationManager : MonoBehaviour
     public bool isPlayingReverse = false;
     public bool isPlayingReverseTransition = false;
 
+    [Header("Animation Quality")]
+    public Dictionary<string, float> animationQualities = new Dictionary<string, float>();
+
     // Public property to check if reverse transition is playing
     public bool IsPlayingReverseTransition => isPlayingReverseTransition;
 
@@ -172,8 +175,6 @@ public class PlayerAnimationManager : MonoBehaviour
             animationTimer = 0f;
             isAnimating = true;
             UpdatePlayerSprite();
-
-            Debug.Log($"Playing animation '{animationType}' - Reverse: {playReverse}, Starting frame: {currentFrameIndex}, Transition lock: {isPlayingReverseTransition}");
         }
     }
 
@@ -189,12 +190,15 @@ public class PlayerAnimationManager : MonoBehaviour
         collectedFrames.Add(frameData);
     }
 
-    public void CreateCustomAnimation(string animationType, List<FrameData> frames, float frameRate, bool shouldLoop = true)
+    public void CreateCustomAnimation(string animationType, List<FrameData> frames, float frameRate, bool shouldLoop = true, float quality = 1.0f)
     {
         if (frames.Count == 0)
         {
             return;
         }
+
+        // Store the quality for this animation type
+        animationQualities[animationType] = quality;
 
         // Remove existing animation of the same type
         createdAnimations.RemoveAll(anim => anim.animationType == animationType);
@@ -212,40 +216,37 @@ public class PlayerAnimationManager : MonoBehaviour
             UpdatePlayerSprite();
         }
 
-        // Unlock the corresponding ability
-        UnlockAbility(animationType);
+        // Unlock the corresponding ability with quality multiplier
+        UnlockAbility(animationType, quality);
     }
 
-    void UnlockAbility(string animationType)
+    void UnlockAbility(string animationType, float quality)
     {
         if (playerController == null) return;
-
-        Debug.Log($"Unlocking ability for animation type: {animationType}");
 
         switch (animationType.ToLower())
         {
             case "walk":
-                playerController.UnlockWalking(1.0f);
-                Debug.Log("Walking ability unlocked!");
+                playerController.UnlockWalking(quality);
+                Debug.Log($"Walking ability unlocked with {quality:F2} quality!");
                 break;
             case "jump":
-                playerController.UnlockJumping(1.0f);
-                Debug.Log("Jumping ability unlocked!");
+                playerController.UnlockJumping(quality);
+                Debug.Log($"Jumping ability unlocked with {quality:F2} quality!");
                 break;
             case "prone":
-                playerController.UnlockProning(1.0f);
-                Debug.Log("Prone ability unlocked!");
+                playerController.UnlockProning(quality);
+                Debug.Log($"Prone ability unlocked with {quality:F2} quality!");
                 break;
             case "crawl":
-                playerController.UnlockCrawling(1.0f);
-                Debug.Log("Crawling ability unlocked!");
+                playerController.UnlockCrawling(quality);
+                Debug.Log($"Crawling ability unlocked with {quality:F2} quality!");
                 break;
             case "idle":
                 if (playerRigidbody != null && playerRigidbody.linearVelocity.magnitude < 0.1f)
                 {
                     TriggerIdleAnimation();
                 }
-                Debug.Log("Idle animation available!");
                 break;
             default:
                 Debug.LogWarning($"No ability unlock defined for animation type: {animationType}");
@@ -311,6 +312,12 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         createdAnimations.RemoveAll(anim => anim.animationType == animationType);
 
+        // Remove quality data
+        if (animationQualities.ContainsKey(animationType))
+        {
+            animationQualities.Remove(animationType);
+        }
+
         if (currentAnimation != null && currentAnimation.animationType == animationType)
         {
             StopAnimation();
@@ -323,36 +330,34 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         if (playerController == null) return;
 
-        Debug.Log($"Locking ability for animation type: {animationType}");
-
         switch (animationType.ToLower())
         {
             case "walk":
                 playerController.LockWalking();
-                Debug.Log("Walking ability locked!");
                 break;
             case "jump":
                 playerController.LockJumping();
-                Debug.Log("Jumping ability locked!");
                 break;
             case "prone":
                 playerController.LockProning();
-                Debug.Log("Prone ability locked!");
                 break;
             case "crawl":
                 playerController.LockCrawling();
-                Debug.Log("Crawling ability locked!");
                 break;
             case "idle":
                 if (currentAnimation != null && currentAnimation.animationType == "idle")
                 {
                     StopAnimation();
                 }
-                Debug.Log("Idle animation removed!");
                 break;
             default:
                 Debug.LogWarning($"No ability lock defined for animation type: {animationType}");
                 break;
         }
+    }
+
+    public float GetAnimationQuality(string animationType)
+    {
+        return animationQualities.ContainsKey(animationType) ? animationQualities[animationType] : 1.0f;
     }
 }

@@ -16,25 +16,23 @@ public class InventoryDropHandler : MonoBehaviour, IDropHandler
                 TimelineSlotFrame timelineFrame = draggableFrame.GetComponent<TimelineSlotFrame>();
                 if (timelineFrame != null)
                 {
-                    // Return frame to inventory
+                    // ONLY timeline frames should be returned to inventory
                     PlayerAnimationManager.Instance.collectedFrames.Add(draggableFrame.frameData);
-
                     // Clear the original slot
                     timelineFrame.originalSlot.ClearSlotWithoutReturningToInventory();
-
                     // Refresh inventory display
                     animationInterface.RefreshInventoryDisplay();
-
-                    // Destroy the dragged item
-                    Destroy(eventData.pointerDrag);
                 }
                 else
                 {
-                    // This frame came from inventory originally, just return it
-                    PlayerAnimationManager.Instance.collectedFrames.Add(draggableFrame.frameData);
+                    // This frame came from inventory originally - DON'T add it back!
+                    // It's already in the collectedFrames list
+                    // Just refresh the display to clean up any visual issues
                     animationInterface.RefreshInventoryDisplay();
-                    Destroy(eventData.pointerDrag);
                 }
+
+                // Mark as successfully dropped and destroy the dragged object
+                draggableFrame.OnSuccessfulDrop();
             }
         }
     }

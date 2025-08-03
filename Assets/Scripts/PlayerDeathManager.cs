@@ -22,6 +22,10 @@ public class PlayerDeathManager : MonoBehaviour
     public float deathDuration = 2f; // Total time before respawn
     public bool freezePlayerDuringDeath = true;
 
+    [Header("Death Sound")]
+    public AudioSource audioSource;
+    public AudioClip deathSound;
+
     // References
     private SpriteRenderer playerSpriteRenderer;
     private PlayerController playerController;
@@ -90,6 +94,8 @@ public class PlayerDeathManager : MonoBehaviour
         if (isDying || isDead) return; // Prevent multiple death triggers
 
         Debug.Log("Player death triggered!");
+
+        audioSource.PlayOneShot(deathSound);
 
         isDying = true;
         isDead = false;
