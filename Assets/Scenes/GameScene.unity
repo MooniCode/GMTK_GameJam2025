@@ -6490,7 +6490,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c914cd124c908c24eb46eebc98d34771, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skipIntroduction: 0
+  skipIntroduction: 1
   flySpeed: 2
   sineAmplitude: 0.4
   sineFrequency: 4

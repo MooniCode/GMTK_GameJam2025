@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 using Random = UnityEngine.Random;
@@ -7,7 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float baseWalkSpeed = 5f;
-    public float baseCrawlSpeed = 2f; // Crawling is slower than walking
+    public float baseCrawlSpeed = 2f;
     public float baseJumpHeight = 3f;
 
     [Header("Quality Modifiers")]
@@ -37,7 +38,7 @@ public class PlayerController : MonoBehaviour
     public float overheadCheckWidth = 0.6f; // Width of the overhead check
     public LayerMask overheadLayerMask = 1; // What layers count as obstacles above
 
-    [Header("Unlocked Abilities")]
+    [Header("Unlockable Abilities")]
     public bool canWalk = false;
     public bool canJump = false;
     public bool canProne = false;
@@ -50,7 +51,7 @@ public class PlayerController : MonoBehaviour
     public AudioSource playerAudioSource;
     public AudioClip[] footstepSounds;
     public float footstepInterval = 0.3f;
-    public float crawlSoundInterval = 0.5f; // Crawling sounds are slower
+    public float crawlSoundInterval = 0.5f; // Crawling sounds slower
 
     // Components
     private Rigidbody2D rb;
@@ -185,8 +186,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!canMove) return; // Death system check
 
-        // Capture horizontal input for movement (AZERTY keyboard: Q and D)
-        // On AZERTY: Q is where A is on QWERTY, D is in the same position
+        // Quick hack to fix input between different keyboard loayouts
         float qInput = Input.GetKey(KeyCode.A) ? -1f : 0f; // AZERTY Q (physical A position)
         float dInput = Input.GetKey(KeyCode.D) ? 1f : 0f;  // AZERTY D (same position)
         horizontalInput = qInput + dInput;
@@ -217,9 +217,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (!proneHeld && isProne && isObstructedAbove)
         {
-            // Player wants to stand but can't due to obstruction - keep them prone
-            // This prevents the player from standing up in tight spaces
-            // No need to change isProne state, just continue being prone
+            // do nothing
             Debug.Log("Can't stand up - obstruction above!");
         }
 
@@ -326,7 +324,7 @@ public class PlayerController : MonoBehaviour
         // Play crawl sounds at intervals (slower than footsteps)
         if (Time.time - lastFootstepTime >= crawlSoundInterval && footstepSounds.Length > 0)
         {
-            PlayFootStepSound(); // Using same sound for now, but could be different
+            PlayFootStepSound(); // Same sound as walking
             lastFootstepTime = Time.time;
         }
 
@@ -353,7 +351,6 @@ public class PlayerController : MonoBehaviour
         float actualJumpHeight = baseJumpHeight * jumpHeightQuality;
 
         // Calculate jump velocity needed to reach desired height
-        // Using: v = sqrt(2 * g * h) where g is gravity (positive value)
         float jumpVelocity = Mathf.Sqrt(2f * Mathf.Abs(Physics2D.gravity.y * rb.gravityScale) * actualJumpHeight);
 
         // Set vertical velocity
@@ -376,8 +373,17 @@ public class PlayerController : MonoBehaviour
 
         if (isProne)
         {
+            float qualityToUse;
+
             // Determine which quality to use (prone or crawl)
-            float qualityToUse = isCrawling ? crawlColliderQuality : proneColliderQuality;
+            if (isCrawling)
+            {
+                qualityToUse = crawlColliderQuality;
+            } 
+            else
+            {
+                qualityToUse = proneColliderQuality;
+            }
 
             // Interpolate between poor and perfect collider settings based on quality
             Vector2 colliderSize = Vector2.Lerp(poorProneColliderSize, perfectProneColliderSize, qualityToUse);
@@ -492,7 +498,7 @@ public class PlayerController : MonoBehaviour
         wasMoving = isMoving;
     }
 
-    // Called by Animation Manager when player completes an animation
+    // Called when player completes walk animation
     public void UnlockWalking(float qualityMultiplier)
     {
         canWalk = true;
@@ -500,6 +506,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Walking unlocked! canWalk = {canWalk}, quality = {walkSpeedQuality:F2}");
     }
 
+    // Called when player completes jump animation
     public void UnlockJumping(float qualityMultiplier)
     {
         canJump = true;
@@ -507,6 +514,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Jumping unlocked! canJump = {canJump}, quality = {jumpHeightQuality:F2}");
     }
 
+    // Called when player completes prone animation
     public void UnlockProning(float qualityMultiplier)
     {
         canProne = true;
@@ -514,6 +522,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Prone unlocked! canProne = {canProne}, quality = {proneColliderQuality:F2}");
     }
 
+    // Called when player completes crawl animation
     public void UnlockCrawling(float qualityMultiplier)
     {
         canCrawl = true;
@@ -521,7 +530,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Crawling unlocked! canCrawl = {canCrawl}, quality = {crawlColliderQuality:F2}");
     }
 
-    // Called by Animation Manager when animations are removed
+    // Called when player removes walk animation
     public void LockWalking()
     {
         canWalk = false;
@@ -535,6 +544,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Called when player removes jump animation
     public void LockJumping()
     {
         canJump = false;
@@ -542,6 +552,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Jumping locked! canJump = {canJump}");
     }
 
+    // Called when player removes prone animation
     public void LockProning()
     {
         canProne = false;
@@ -558,6 +569,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Called when player removes crawl animation
     public void LockCrawling()
     {
         canCrawl = false;
@@ -570,29 +582,6 @@ public class PlayerController : MonoBehaviour
             isCrawling = false;
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); // Stop movement
             HandleAnimations(); // Switch back to prone animation
-        }
-    }
-
-    // Visualize ground check and overhead check in scene view
-    void OnDrawGizmosSelected()
-    {
-        if (groundCheck != null)
-        {
-            Gizmos.color = isGrounded ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        }
-
-        if (overheadCheck != null)
-        {
-            // Draw overhead detection area
-            Gizmos.color = isObstructedAbove ? Color.red : Color.green;
-            Vector3 boxCenter = overheadCheck.position + Vector3.up * (overheadCheckDistance * 0.5f);
-            Vector3 boxSize = new Vector3(overheadCheckWidth, overheadCheckDistance, 0.1f);
-            Gizmos.DrawWireCube(boxCenter, boxSize);
-
-            // Draw a line showing the check direction
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(overheadCheck.position, overheadCheck.position + Vector3.up * overheadCheckDistance);
         }
     }
 }

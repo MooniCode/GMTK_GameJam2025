@@ -115,8 +115,6 @@ public class EnemyProjectileShooter : MonoBehaviour
         if (playerIsOnRight != facingRight)
         {
             facingRight = playerIsOnRight;
-            // Flip the entire GameObject (this will flip all children too)
-            // Since sprites face left by default, we flip when player is on the right
             Vector3 scale = transform.localScale;
             if (playerIsOnRight)
             {

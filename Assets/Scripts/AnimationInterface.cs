@@ -79,10 +79,10 @@ public class AnimationInterface : MonoBehaviour
     public TMP_Dropdown animationTypeDropdown;
 
     [Header("UI Animation Control")]
-    public Animator uiAnimator; // Drag your animator here in the inspector
+    public Animator uiAnimator;
 
     [Header("Player Feedback")]
-    public TMPro.TextMeshProUGUI feedbackText; // Text to show "X/Y frames correct"
+    public TMPro.TextMeshProUGUI feedbackText;
 
     private List<FrameData> timelineFrames;
     private List<TimelineSlot> timelineSlots;
